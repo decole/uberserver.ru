@@ -13,7 +13,8 @@ class Hello extends Command
      *
      * @var string
      */
-    protected $signature = 'hello {option}';
+//    protected $signature = 'hello {option}';
+    protected $signature = 'hello';
 
     /**
      * The console command description.
@@ -39,25 +40,27 @@ class Hello extends Command
      */
     public function handle()
     {
-        $optionCommand = $this->argument('option');
-        if($optionCommand == 'list') {
-            $this->info('Memcached list !');
-            $key = $this->ask('What is KEY memcached ?');
-
-            $this->info(Cache::get($key));
-        }
-        if($optionCommand == 'set') {
-            $key = $this->ask('What is KEY memcached ?');
-            $value = $this->ask('What is VALUE memcached ?');
-            $expiresAt = Carbon::now()->addMinutes(60);
-
-            Cache::put($key, $value, $expiresAt);
-        }
+        self::fire();
+//        $optionCommand = $this->argument('option');
+//        if($optionCommand == 'list') {
+//            $this->info('Memcached list !');
+//            $key = $this->ask('What is KEY memcached ?');
+//
+//            $this->info(Cache::get($key));
+//        }
+//        if($optionCommand == 'set') {
+//            $key = $this->ask('What is KEY memcached ?');
+//            $value = $this->ask('What is VALUE memcached ?');
+//            $expiresAt = Carbon::now()->addMinutes(60);
+//
+//            Cache::put($key, $value, $expiresAt);
+//        }
 
     }
 
     public function fire()
     {
+        echo "start hello with echo" . PHP_EOL;
         $this->info('Fire !');
     }
 

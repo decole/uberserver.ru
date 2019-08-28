@@ -5,10 +5,23 @@ namespace App;
 use App\Helpers\WateringHelper;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * This is the model class for table "schedule".
+ *
+ * @property int     $id
+ * @property string  $command
+ * @property string  $interval
+ * @property string  $last_run
+ * @property string  $next_run
+ * @property \Carbon\Carbon $created
+ * @property \Carbon\Carbon $updated
+ */
 class Schedule extends Model
 {
-    protected $table = 'shedule';
+    protected $table = 'schedule';
 
+    const CREATED_AT = 'created';
+    const UPDATED_AT = 'updated';
     /**
      * {@inheritdoc}
      */

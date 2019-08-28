@@ -17,8 +17,7 @@ class Telegram extends Migration
             $table->bigIncrements('id');
             $table->text('mesage');
             $table->integer('update_id');
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent();
+            $table->timestamps();
         });
     }
 

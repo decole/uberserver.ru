@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Helpers\WateringHelper;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
+use Whoops\Exception\ErrorException;
 
 /**
  * Command line interface to manage and runs scheduled tasks.
@@ -93,41 +95,16 @@ class Schedule extends Command
 
     }
 
-    public function init() {
-        if (!\Yii::$app instanceof ConsoleApplication) {
-            throw new Exception('Yii::$app is not an instance of ConsoleApplication.');
-            return Controller::EXIT_CODE_ERROR;
-        }
-        parent::init();
-    }
-    public function beforeAction($action) {
-        if(strtolower($this->verbose) === "false" || $this->verbose === "0") {
-            $this->verbose = false;
-        } else {
-            $this->verbose = true;
-        }
-        return parent::beforeAction($action);
-
-    }
-    public function options($actionID) {
-        if($actionID == 'add') {
-            $options = ['verbose','command','interval','nextRun'];
-        } elseif($actionID == 'delete') {
-            $options = ['verbose','scheduleId'];
-        } else {
-            $options = ['verbose'];
-        }
-        return $options;
-    }
     /**
      * Run scheduled tasks.
      */
     public function actionRun()
     {
-        $schedule = Schedule::find()->all();
+        $schedule = \App\Schedule::all();
+        $this->info('start');
         if(!$schedule) {
-            $this->warning('No schedule models retrieved.');
-            return Controller::EXIT_CODE_NORMAL;
+            $this->info('No schedule models retrieved.');
+            return true;
         }
 
         $successCount = 0;
@@ -137,46 +114,39 @@ class Schedule extends Command
             }
         }
         if( $successCount > 0 ) {
-            $this->log("Successfully ran $successCount commands.");
+            $this->info("Successfully ran $successCount commands.");
         } else {
-            $this->warning("No commands executed.");
+            $this->info("No commands executed.");
         }
-        return Controller::EXIT_CODE_NORMAL;
+        return true;
     }
+
     protected function _runCommand($single) {
         if( !$single->next_run || $single->next_run == null ) {
-            $this->log('Next run date for command not found. Skipping.');
+            $this->info('Next run date for command not found. Skipping.');
             return false;
         }
+
         $nextRunDate = new \DateTime( $single->next_run );
         $currentDate = new \DateTime('NOW');
         if($currentDate > $nextRunDate) {
-            $this->log('Next run date for command is before current date. Running.');
-            if(!$single->begin()) {
-                $this->warning('Schedule begin method failed.');
-            }
+            $this->info('Next run date for command is before current date. Running.');
             try {
-                $argvDefault = ['yii'];
-                $argvCommand = explode(' ', $single->command);
-                $_SERVER['argv'] = array_merge($argvDefault, $argvCommand);
-
-                $request = new Request;
-
-                list ($route, $params) = $request->resolve();
-
-                $this->log('Calling runAction for command ' . $route . ' with args ' . print_r($params, true) . '.');
-                \Yii::$app->runAction($route, $params);
+                $this->info('Calling runAction for command \"' . $single->command . '\".');
+                $exitCode = Artisan::call($single->command);
             } catch (ErrorException $e) {
-                $this->warning("Running command encountered an error.\n".$e->getMessage());
+                $this->info("Running command encountered an error.\n".$e->getMessage());
             }
-            if(!$single->end()) {
-                $this->warning('Schedule end method failed.');
+            $this->info('exitCode: ' . $exitCode); // take exit code to check is ok
+            if($exitCode) {
+                $this->info('Schedule end method failed.');
             }
             return true;
         } else {
-            $this->log('Next run date for command is after current date. Skipping.');
+            $this->info('Next run date for command is after current date. Skipping.');
             return false;
         }
+
     }
     /**
      * Add new scheduled task.
@@ -250,14 +220,14 @@ class Schedule extends Command
             echo $this->ansiFormat('Warning: ', Console::FG_YELLOW);
             echo $message . "\n";
         }
-        Yii::warning($message);
+        $this->warning($message);
     }
     public function log($message, $force = false) {
         if($this->verbose || $force) {
-            echo $this->ansiFormat('Info: ', Console::FG_BLUE);
-            echo $message . "\n";
+            //echo $this->ansiFormat('ISchedule::options($actionID)nfo: ', Console::FG_BLUE);
+            $this->info($message);
         }
-        Yii::info($message);
+        $this->info($message);
     }
     public function printTableRow($vals, $cellChars = 20, $color = false) {
         $lastIndex = count($vals) - 1;

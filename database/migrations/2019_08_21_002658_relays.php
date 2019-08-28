@@ -19,6 +19,10 @@ class Relays extends Migration
             $table->string('topic');
             $table->integer('state');
             $table->timestamps();
+
+            $table->primary('id');
+            $table->index('topic');
+            $table->index('name');
         });
     }
 
