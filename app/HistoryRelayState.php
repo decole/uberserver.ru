@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * This is the model class for table "alice_secure".
+ * This is the model class for table "history_relay_states".
  *
  * @property int $id
  * @property int $id_relay
@@ -16,8 +16,5 @@ use Illuminate\Database\Eloquent\Model;
  */
 class HistoryRelayState extends Model
 {
-    //$table->bigIncrements('id');
-    //            $table->integer('id_relay');
-    //            $table->string('topic');
-    //            $table->boolean('state');
+    //
 }
