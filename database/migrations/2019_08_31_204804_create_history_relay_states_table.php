@@ -20,10 +20,9 @@ class CreateHistoryRelayStatesTable extends Migration
             $table->boolean('state');
             $table->timestamps();
 
-            $table->primary('id');
-            $table->index('id_relay');
-            $table->index('topic');
-            $table->index('created_at');
+            $table->index('id_relay','id_relay');
+            $table->index('topic','topic');
+            $table->index('created_at','created_at');
 
         });
 

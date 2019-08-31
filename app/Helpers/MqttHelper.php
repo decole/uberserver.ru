@@ -1,9 +1,8 @@
 <?php
 namespace App\Helpers;
 
+use App\HistoryRelayState;
 use App\MqttPayload;
-use App\MqttSensors;
-use App\Relays;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -73,6 +72,7 @@ class MqttHelper extends BaseController
 
     /**
      * @param $message
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function process($message){
         $options = static::listTopics()[$message->topic] ?? null;
@@ -92,6 +92,7 @@ class MqttHelper extends BaseController
      * Analising mqtt payload on current topic in memcache and recording one in 1 minute
      * @param $message
      * @param $options
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function analising($message, $options): void
     {
@@ -212,9 +213,18 @@ class MqttHelper extends BaseController
      */
     public function saveState($id, $value): void
     {
-        DB::table('relays')
+        if($value == 'on') {
+            $value = 1;
+        }
+        if($value == 'off') {
+            $value = 0;
+        }
+
+        $relay = DB::table('relays')
             ->where('id', $id)
             ->update(['state' => $value]);
+
+        HistoryRelayState::historySave($id, $value);
     }
 
 

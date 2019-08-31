@@ -22,8 +22,8 @@ class TableSchedule extends Migration
             $table->timestamp('created')->useCurrent();
             $table->timestamp('updated')->useCurrent();
 
-            $table->index('next_run');
-            $table->index('command');
+            $table->index(1,'next_run');
+            $table->index(1,'command');
         });
     }
 

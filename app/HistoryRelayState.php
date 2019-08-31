@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Relays;
 
 /**
  * This is the model class for table "history_relay_states".
@@ -16,5 +17,13 @@ use Illuminate\Database\Eloquent\Model;
  */
 class HistoryRelayState extends Model
 {
-    //
+    public static function historySave($id, $value)
+    {
+        $model = new self();
+        $model->id_relay = $id;
+        $model->topic = Relays::where('id', $id)->first()->topic;
+        $model->state = $value;
+        $model->save();
+    }
+
 }

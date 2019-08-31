@@ -14,24 +14,20 @@ class MakeIndexes extends Migration
     public function up()
     {
         Schema::table('alice', function (Blueprint $table) {
-            $table->primary('id');
-            $table->index('session_id');
+            $table->index('session_id','session_id');
         });
 
         Schema::table('alice_secure', function (Blueprint $table) {
-            $table->primary('id');
-            $table->index('user_id');
+            $table->index('user_id','user_id');
         });
 
         Schema::table('mqtt_payload', function (Blueprint $table) {
-            $table->primary('id');
-            $table->index('topic');
+            $table->index('topic','topic');
         });
 
         Schema::table('weather', function (Blueprint $table) {
-            $table->primary('id');
-            $table->index('date');
-            $table->index('created_at');
+            $table->index('date','date');
+            $table->index('created_at','created_at');
         });
 
 
