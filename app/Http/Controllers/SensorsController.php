@@ -83,8 +83,13 @@ class SensorsController extends Controller
     private function verifiMqttData($topic)
     {
         $cache = new MqttHelper();
-        return $cache->getCacheMqtt($topic) ??
-            MqttPayload::where(['topic' => $topic])->orderByDesc('created_at', 'id')->first()->payload . ' - no cache';
+        $data = null;
+        $data = $cache->getCacheMqtt($topic);
+        if($data === null) {
+            return MqttPayload::where(['topic' => $topic])->orderByDesc('created_at', 'id')->first()->payload . ' - no cache';
+        }
+        return $data;
+
 
     }
 
