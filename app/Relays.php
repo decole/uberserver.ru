@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $topic
  * @property integer $state
- * @property string $created_at
- * @property string $updated_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class Relays extends Model
 {

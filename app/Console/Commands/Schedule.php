@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\WateringHelper;
+use DateInterval;
+use DateTime;
+use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Whoops\Exception\ErrorException;
+use Carbon\Carbon;
 
 /**
  * Command line interface to manage and runs scheduled tasks.
@@ -75,6 +77,7 @@ class Schedule extends Command
      * Execute the console command.
      *
      * @return void
+     * @throws Exception
      */
     public function handle()
     {
@@ -101,7 +104,7 @@ class Schedule extends Command
     public function actionRun()
     {
         $schedule = \App\Schedule::all();
-        $this->info('start');
+
         if(!$schedule) {
             $this->info('No schedule models retrieved.');
             return true;
@@ -121,26 +124,58 @@ class Schedule extends Command
         return true;
     }
 
+    /**
+     * @param $single \App\Schedule
+     * @return bool
+     * @throws Exception
+     */
     protected function _runCommand($single) {
         if( !$single->next_run || $single->next_run == null ) {
             $this->info('Next run date for command not found. Skipping.');
             return false;
         }
 
+        $currentDate = new \DateTime( 'NOW' );
         $nextRunDate = new \DateTime( $single->next_run );
-        $currentDate = new \DateTime('NOW');
-        if($currentDate > $nextRunDate) {
-            $this->info('Next run date for command is before current date. Running.');
+
+        if($currentDate->format('U') > $nextRunDate->format('U')) {
+            $this->info('Running.');
             try {
                 $this->info('Calling runAction for command \"' . $single->command . '\".');
-                $exitCode = Artisan::call($single->command);
+                $single->next_run = null;
+                $single->save();
+
+                $argvCommand = explode(' ', $single->command);
+                $route = $argvCommand[0];
+                unset($argvCommand[0]);
+                $arrayOptions = [];
+                if(!empty($argvCommand)) {
+                    foreach ($argvCommand as $argvCommandValue) {
+                        $argvCommandArray = explode('=', $argvCommandValue);
+                        $arrayOptions[str_replace([' ', '-'], '', $argvCommandArray[0])] = $argvCommandArray[1];
+                    }
+                }
+                $exitCode = $this->call($route, $arrayOptions);
+
             } catch (ErrorException $e) {
                 $this->info("Running command encountered an error.\n".$e->getMessage());
             }
             $this->info('exitCode: ' . $exitCode); // take exit code to check is ok
             if($exitCode) {
                 $this->info('Schedule end method failed.');
+                return false;
             }
+
+            $lastRunDate = new DateTime('NOW');
+            $single->last_run = $lastRunDate->format('Y-m-d H:i:s');
+            if($single->interval !== null && $single->interval !== '') {
+                $interval = DateInterval::createFromDateString( $single->interval );
+                $nextRunDate = $lastRunDate->add( $interval );
+                $single->next_run = $nextRunDate->format('Y-m-d H:i:s');
+            }
+
+            $single->save();
+
             return true;
         } else {
             $this->info('Next run date for command is after current date. Skipping.');
@@ -154,33 +189,39 @@ class Schedule extends Command
     public function actionAdd()
     {
         if(!$this->command) {
-            $this->command = $this->prompt('Enter the Yii console command to run in the format controller/action --param1=param1value --param2=param2value:',['required'=>true]);
+            $this->command = $this->ask('Enter the Laravel console command to run in the format controller/action --param1=param1value --param2=param2value:');
         }
 
         if(!$this->interval) {
-            $this->interval = $this->prompt('Enter the interval to run this command or leave blank to run it once. Input should be a string that PHP can interpret as a DateTime interval i.e. 10 seconds, 1 hour, 2 days:');
+            $this->interval = $this->ask('Enter the interval to run this command or leave blank to run it once. Input should be a string that PHP can interpret as a DateTime interval i.e. 10 seconds, 1 hour, 2 days:');
         }
         if(!$this->nextRun) {
-            $this->nextRun = $this->prompt('Enter the date and time to begin:', ['default'=>null]);
+            $this->nextRun = $this->ask('Enter the date and time to begin:', date('d-m-Y H:i:s'));
         }
 
-        if($result = Schedule::add($this->command, $this->interval, $this->nextRun)) {
-            $this->log('Scheduled command successfully save.', true);
+
+        $model = new \App\Schedule();
+        $model->command = $this->command;
+        $model->interval = $this->interval;
+        $model->next_run = Carbon::now()->toDateTimeString();
+        $model->last_run = null;
+
+        if($model->save()) {
+            $this->info('Scheduled command successfully save.');
         } else {
-            $this->warning('Added scheduled command failed.', true);
-            var_dump($result->getErrors());
+            $this->info('Added scheduled command failed.');
         }
 
-        return Controller::EXIT_CODE_NORMAL;
+        return true;
     }
     /**
      * List currently scheduled tasks.
      */
     public function actionList() {
-        $schedule = Schedule::find()->all();
+        $schedule = \App\Schedule::all();
         if(!$schedule) {
-            $this->warning('No schedule records found.');
-            return Controller::EXIT_CODE_NORMAL;
+            $this->info('No schedule records found.');
+            return true;
         }
         $this->printTableRow(['ID', 'Command', 'Interval', 'Last Run', 'Next Run']);
         $this->printEmptyRow();
@@ -188,7 +229,7 @@ class Schedule extends Command
             $this->printTableRow([$single->id, $single->command, $single->interval, $single->last_run, $single->next_run]);
             $this->printEmptyRow();
         }
-        return Controller::EXIT_CODE_NORMAL;
+        return true;
     }
     /**
      * Delete scheduled task.
@@ -196,39 +237,30 @@ class Schedule extends Command
     public function actionDelete() {
         if($this->scheduleId === null) {
             $this->actionList();
-            $this->scheduleId = $this->prompt('Enter ID of the scheduled task to delete:',['required'=>true]);
+            $this->scheduleId = $this->ask('Enter ID of the scheduled task to delete:');
+            // $this->prompt('Enter ID of the scheduled task to delete:',['required'=>true]);
         }
-        $model = Schedule::findOne(intval($this->scheduleId));
+        $model = \App\Schedule::find(intval($this->scheduleId));
         if(!$model) {
-            throw new Exception('Schedule with ID ' . $this->scheduleId . ' not found.');
-            return Controller::EXIT_CODE_ERROR;
+            $this->info('Schedule with ID ' . $this->scheduleId . ' not found.');
+            return false;
         }
-        if(!$this->confirm('Are you sure you want to permanently delete this record?')) {
-            $this->log('Delete aborted by user.');
-            return Controller::EXIT_CODE_NORMAL;
+        $question = $this->ask('Are you sure you want to permanently delete this record? Y/N');
+        if($question == 'N' ?? $question == 'n' ) {
+            $this->info('Delete aborted by user.');
+            return true;
         }
-        if($model->delete()) {
-            $this->warning('Schedule with ID ' . $this->scheduleId . ' successfully deleted.');
-            return Controller::EXIT_CODE_NORMAL;
-        } else {
-            $this->log('Schedule with ID ' . $this->scheduleId . ' was not deleted.');
-            return Controller::EXIT_CODE_ERROR;
+        if($question == 'Y' ?? $question == 'y' ){
+            if (\App\Schedule::destroy($this->scheduleId)) {
+                $this->info('Schedule with ID ' . $this->scheduleId . ' successfully deleted.');
+                return true;
+            } else {
+                $this->info('Schedule with ID ' . $this->scheduleId . ' was not deleted.');
+                return false;
+            }
         }
     }
-    public function warning($message, $force = false) {
-        if($this->verbose || $force) {
-            echo $this->ansiFormat('Warning: ', Console::FG_YELLOW);
-            echo $message . "\n";
-        }
-        $this->warning($message);
-    }
-    public function log($message, $force = false) {
-        if($this->verbose || $force) {
-            //echo $this->ansiFormat('ISchedule::options($actionID)nfo: ', Console::FG_BLUE);
-            $this->info($message);
-        }
-        $this->info($message);
-    }
+
     public function printTableRow($vals, $cellChars = 20, $color = false) {
         $lastIndex = count($vals) - 1;
         $nextRow = [];
@@ -259,6 +291,7 @@ class Schedule extends Command
             $this->printTableRow($nextRow, $cellChars, $color);
         }
     }
+
     public function printEmptyRow() {
         $this->printTableRow(['--------------------', '--------------------', '--------------------', '--------------------', '--------------------']);
     }

@@ -24,7 +24,7 @@
                 <li class="{{ (request()->is('sensors*')) ? 'active' : '' }}"><a href="/sensors"><i class="fa fa-dashboard"></i> <span>Sensors</span></a></li>
                 <li class="{{ (request()->is('watering*')) ? 'active' : '' }}"><a href="/watering"><i class="fa fa-dashboard"></i> <span>Watering</span></a></li>
                 <li class="{{ (request()->is('chart*')) ? 'active' : '' }}"><a href="/chart"><i class="fa fa-bar-chart"></i> <span>Charts</span></a></li>
-                <li class="{{ (request()->is('alarm*')) ? 'active' : '' }}"><a href="/alarm"><i class="fa fa-warning"></i> <span>Alarm</span></a></li>
+{{--                <li class="{{ (request()->is('alarm*')) ? 'active' : '' }}"><a href="/alarm"><i class="fa fa-warning"></i> <span>Alarm</span></a></li>--}}
                 {{--<li><a href="/login"><i class="fa fa-link"></i> <span>login</span></a></li>--}}
                 <li><a href="https://blog.uberserver.ru/"><i class="fa fa-link"></i> <span>Blog</span></a></li>
             </ul>

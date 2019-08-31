@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $user_id
  * @property int $valid
- * @property string $created_at
- * @property string $updated_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class AliceSecure extends Model
 {

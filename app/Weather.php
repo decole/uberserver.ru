@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $temperature
  * @property string $spec
  * @property integer $date
- * @property string $created_at
- * @property string $updated_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class Weather extends Model
 {

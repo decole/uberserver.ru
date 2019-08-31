@@ -64,7 +64,7 @@ class SensorsCommand extends UserCommand
 
         $data = [
             'chat_id' => $chat_id,
-            'text'    => $text,
+            'text'    => $text . ' laravel',
         ];
 
         return Request::sendMessage($data);

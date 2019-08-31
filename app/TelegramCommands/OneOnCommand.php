@@ -64,7 +64,7 @@ class OneOnCommand extends UserCommand
 
         $data = [
             'chat_id' => $chat_id,
-            'text'    => 'ok',
+            'text'    => 'ok' . ' laravel',
         ];
 
         return Request::sendMessage($data);

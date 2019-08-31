@@ -105,7 +105,7 @@ class DateCommand extends UserCommand
         $message = $this->getMessage();
         $chat_id  = $message->getChat()->getId();
 
-        $text = 'Текущая дата: ' . date(" d ") . $this->getRusMonth() . ', ' . $this->getRusDay();
+        $text = 'Текущая дата: ' . date(" d ") . $this->getRusMonth() . ', ' . $this->getRusDay() . ' laravel';
 
         $data = [
             'chat_id' => $chat_id,

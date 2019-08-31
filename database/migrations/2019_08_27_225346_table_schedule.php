@@ -17,8 +17,8 @@ class TableSchedule extends Migration
             $table->bigIncrements('id');
             $table->string('command');
             $table->string('interval');
-            $table->dateTime('last_run');
-            $table->dateTime('next_run');
+            $table->dateTime('last_run')->nullable();
+            $table->dateTime('next_run')->nullable();
             $table->timestamp('created')->useCurrent();
             $table->timestamp('updated')->useCurrent();
 

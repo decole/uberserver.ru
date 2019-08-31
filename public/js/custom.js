@@ -60,15 +60,18 @@ $(document).ready(function () {
     leakage();
 
     function stateRelays() {
-        $(".relay-status[data-id]").map(function (key, value) {
+        $(".relay-control[data-id]").map(function (key, value) {
             topic = $(value).data("id");
             $.get("/api/relay-state?topic="+topic, function (data) {
                 if (data == 1) {
-                    $(value).parent().removeClass('bg-yellow').removeClass('bg-red').addClass('bg-green');
+                    $(value).parent().removeClass("bg-yellow").removeClass("bg-red").addClass("bg-green");
+                    $(value).parent().find( "p.relay-status" ).text('on');
+                    $(value).parent().find( "a" ).removeClass('off').addClass('on');
                 }
                 if (data == 0) {
-                    console.log();
-                    $(value).parent().removeClass('bg-yellow').removeClass('bg-green').addClass('bg-red');
+                    $(value).parent().removeClass("bg-yellow").removeClass("bg-green").addClass("bg-red");
+                    $(value).parent().find( "p.relay-status" ).text('off');
+                    $(value).parent().find( "a" ).removeClass('on').addClass('off');
                 }
             });
         });
@@ -130,6 +133,7 @@ $(document).ready(function () {
     function isCurrentDateForm() {
         if ($('#isDate').val() == 'current') {
             $('#isDate').val(0);
+            console.log($('#isDate').val(0));
         }
     }
 

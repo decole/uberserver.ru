@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Helpers\WateringHelper;
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -105,12 +106,15 @@ class Schedule extends Model
     }
 
     /**
+     *
+     *
+     * @var \App\Schedule $taskModel
      * @param $task
      * @param $date
      */
     private function changeTimer($taskId, $date): void
     {
-        $taskModel = self::find()->where(['id' => $taskId])->limit(1)->one();
+        $taskModel = self::where(['id' => $taskId])->first();
         $taskModel->next_run = $date;
         $taskModel->save();
 

@@ -6,6 +6,15 @@
             {{--<h1>Sensors</h1>--}}
         {{--</div>--}}
     {{--</div>--}}
+<style>
+    a.small-box-footer.off.relay-control {
+        background-color: red;
+    }
+    a.small-box-footer.relay-control.on
+    {
+        background-color: green;
+    }
+</style>
 <div class="row">
     @foreach ($ralays as $key=>$value)
     <div class="col-lg-3 col-xs-6">

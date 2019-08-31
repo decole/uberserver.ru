@@ -34,7 +34,7 @@
                                         <a href="#">
                                             <div class="pull-left">
                                                 <!-- User Image -->
-                                                <img src="{{ asset("images/decole.jpeg") }}" class="img-circle" alt="User Image">
+                                                <img src="{{ asset("img/decole.jpeg") }}" class="img-circle" alt="User Image">
                                             </div>
                                             <!-- Message title and timestamp -->
                                             <h4>
@@ -121,7 +121,7 @@
                             <!-- The user image in the navbar-->
                             <img src="{{ asset("/img/decole.jpeg")}}" class="user-image" alt="User Image">
                             <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                            <span class="hidden-xs">Decole</span>
+                            <span class="hidden-xs">{{ Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu">
                             <!-- The user image in the menu -->
@@ -130,7 +130,7 @@
 
                                 <p>
                                     Decole - Web Developer
-                                    <small>Member since Nov. 2012</small>
+                                    <small>Member since Aug. 2019</small>
                                 </p>
                             </li>
                             <!-- Menu Body -->
@@ -154,7 +154,12 @@
                                     <a href="#" class="btn btn-default btn-flat">Profile</a>
                                 </div>
                                 <div class="pull-right">
-                                    <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                                    <a href="{{ route('logout') }}" class="btn btn-default btn-flat"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();" >Sign out</a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        @csrf
+                                    </form>
                                 </div>
                             </li>
                         </ul>

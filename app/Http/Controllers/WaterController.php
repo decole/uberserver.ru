@@ -4,14 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Relays;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WaterController extends Controller
 {
-    //Route::get('/watering', function () {
-    //    return view('watering', [
-    //        'page_title' => 'Автополив'
-    //    ]);
-    //});
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Page shown watering swifts
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function showSwifts()
     {
         $sensors = Relays::all();
@@ -30,5 +41,7 @@ class WaterController extends Controller
                 'ralays' =>$sensors,
             ]
         );
+
     }
+
 }

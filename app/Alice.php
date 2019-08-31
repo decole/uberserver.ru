@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $command
  * @property string $tokens
  * @property string $json
- * @property string $created_at
- * @property string $updated_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class Alice extends Model
 {
@@ -109,20 +109,20 @@ class Alice extends Model
         return $request;
     }
 
-//    public function startScheduleWatering()
-//    {
-//        Schedule::aliceStartScheduleWatering();
-//        return 'Запущен цикл автополива.';
-//
-//    }
-//
-//    public function stopScheduleWatering()
-//    {
-//        // планировщик все таски полива в null
-//        Schedule::aliceStopScheduleWatering();
-//        return 'Планировщик событий остановил сценарий полива. Автополив сейчас будет отключен.';
-//
-//    }
+    public function startScheduleWatering()
+    {
+        Schedule::aliceStartScheduleWatering();
+        return 'Запущен цикл автополива.';
+
+    }
+
+    public function stopScheduleWatering()
+    {
+        // планировщик все таски полива в null
+        Schedule::aliceStopScheduleWatering();
+        return 'Планировщик событий остановил сценарий полива. Автополив сейчас будет отключен.';
+
+    }
 
     public function hoseOn()
     {

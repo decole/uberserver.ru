@@ -66,7 +66,7 @@ class WateringCommand extends UserCommand
             .'/twooOff'.PHP_EOL.PHP_EOL
             .'/twooOff'.PHP_EOL.PHP_EOL
             .'/threeOn'.PHP_EOL.PHP_EOL
-            .'/threeOff'.PHP_EOL.PHP_EOL;
+            .'/threeOff'.PHP_EOL.PHP_EOL . ' laravel';
 
         $data = [
             'chat_id' => $chat_id,

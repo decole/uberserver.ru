@@ -13,18 +13,6 @@
 
 Route::get('/', 'SiteController@index');
 
-Route::get('/login', function () {
-    return view('login', [
-        'page_title' => 'Авторизация'
-    ]);
-});
-
-Route::get('/template', function () {
-    return view('index', [
-        'page_title' => 'Шаблон'
-    ]);
-});
-
 Route::any('/sensors', 'SensorsController@showSensors');
 
 Route::any('/api/sensor-state', 'SensorsController@stateSensorsGet');
@@ -41,22 +29,20 @@ Route::any('/telegram/webhook', 'TeleBotController@webhook'); // not worked
 
 Route::any('/telegram/set-webhook', 'TeleBotController@setWebhook'); // not worked
 
-Route::get('/template', function () {
-    return view('index', [
-        'page_title' => 'Шаблон'
-    ]);
-});
-
 Route::any('/watering', 'WaterController@showSwifts');
 
-Route::get('/chart', function () {
-    return view('index', [
-        'page_title' => 'Графики - Аналитика'
-    ]);
-});
+Route::get('/chart', 'SensorsController@chartShow');
+
+Route::get('/api/chart', 'SensorsController@chartShowGet');
+
+
 
 Route::get('/alarm', function () {
     return view('index', [
         'page_title' => 'Мониторинг аварийности'
     ]);
 });
+
+Auth::routes();
+
+Route::get('/home', 'SiteController@index')->name('home');

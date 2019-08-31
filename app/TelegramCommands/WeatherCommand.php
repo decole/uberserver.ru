@@ -117,7 +117,7 @@ class WeatherCommand extends UserCommand
             $text .= 'Сейчас температура ' . $acuweth->temperature . ' °C, ' . $acuweth->spec . ', за ближайшие 30 мин.';
         }
         else {
-            $text .= 'Сейчас температура ' . $temp . ' °C, ' . $weather_spec . ', согласно сайту acuweather.com';
+            $text .= 'Сейчас температура ' . $temp . ' °C, ' . $weather_spec . ', согласно сайту acuweather.com' . ' laravel';
         }
 
         $data = [

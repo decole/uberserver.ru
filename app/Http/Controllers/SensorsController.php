@@ -4,16 +4,26 @@ namespace App\Http\Controllers;
 
 
 use App\Helpers\MqttHelper;
-use App\Helpers\TelegramHelper;
 use App\MqttPayload;
 use App\Relays;
 use App\Weather;
 use function GuzzleHttp\Promise\all;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class SensorsController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      *
@@ -87,6 +97,9 @@ class SensorsController extends Controller
     public function stateRelaysGet(Request $request)
     {
         $cache = new MqttHelper();
+        if($cache->getCacheMqtt($request->topic) === null) {
+            return Relays::where(['id' => $request->topic])->first()->state;
+        }
         return $cache->getCacheMqtt($request->topic);
 
     }
@@ -181,17 +194,16 @@ class SensorsController extends Controller
         }
 
         $mqttData = DB::table('mqtt_payload')
-            ->whereDate('created_at', '2019-08-26')
+            ->whereDate('created_at', $date)
             ->where('topic', $topic)
             ->get();
 
         $weatherData = DB::table('weather')
-            ->whereDate('created_at', '2019-08-26')
+            ->whereDate('created_at', $date)
             ->get();
 
         $mqttData = $mqttData->toArray();
         $weatherData = $weatherData->toArray();
-//        return $timeMqtt[] = date_timestamp_get(date_create($mqtt->datetime));
 
         $chart = [];
         $min = '';
