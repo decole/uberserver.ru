@@ -135,10 +135,10 @@ class WateringHelper extends BaseController
      */
     public function OneOn(): void
     {
-        $this->swiftOn($this->swiftMajor);
-        sleep(0.2);
         $this->swiftOn($this->swiftOne);
         sleep(0.4);
+        $this->swiftOn($this->swiftMajor);
+        sleep(0.2);
         $this->swiftOff($this->swiftTwo);
         sleep(0.2);
         $this->swiftOff($this->swiftThree);
@@ -250,7 +250,7 @@ class WateringHelper extends BaseController
     {
         return [
             [ // start checking watering state
-                'topic' => 'smart-watering/check-commands',
+                'topic' => 'water:check',
                 'name' => 'проврка системы полива',
                 'working_minutes' => 3,
                 'type' => 'check',
@@ -258,51 +258,51 @@ class WateringHelper extends BaseController
                 'time_at' => date('H:i:s'),
             ],
             [ // start 1-th swift watering
-                'topic' => 'smart-watering/one-on',
+                'topic' => 'water:on --name=1',
                 'name' => 'включение клапана 1',
                 'working_minutes' => 10,
                 'type' => 'scenario',
-                'id_in_db' => 4,
+                'id_in_db' => 3,
                 'time_at' => '17:55:00',
             ],
             [ // start 2-nd swift watering
-                'topic' => 'smart-watering/two-on',
+                'topic' => 'water:on --name=2',
                 'name' => 'включение клапана 2',
                 'working_minutes' => 70,
+                'type' => 'scenario',
+                'id_in_db' => 4,
+                'time_at' => null,
+            ],
+            [ // start 3-th swift watering
+                'topic' => 'water:on --name=3',
+                'name' => 'включение клапана 3',
+                'working_minutes' => 60,
+                'type' => 'scenario',
+                'id_in_db' => 5,
+                'time_at' => null,
+            ],
+            [ // ending life cycle , turn-off all swifts
+                'topic' => 'water:off --name=0',
+                'name' => 'отключение полива',
+                'working_minutes' => 1,
                 'type' => 'scenario',
                 'id_in_db' => 6,
                 'time_at' => null,
             ],
-            [ // start 3-th swift watering
-                'topic' => 'smart-watering/three-on',
-                'name' => 'включение клапана 3',
-                'working_minutes' => 60,
+            [ // start 1-th swift watering
+                'topic' => 'water:on --name=1',
+                'name' => 'включение клапана 1',
+                'working_minutes' => 90,
                 'type' => 'scenario',
                 'id_in_db' => 8,
-                'time_at' => null,
+                'time_at' => '16:10:00',
             ],
             [ // ending life cycle , turn-off all swifts
-                'topic' => 'smart-watering/major-off',
+                'topic' => 'water:off --name=0',
                 'name' => 'отключение полива',
                 'working_minutes' => 1,
                 'type' => 'scenario',
                 'id_in_db' => 9,
-                'time_at' => null,
-            ],
-            [ // start 1-th swift watering
-                'topic' => 'smart-watering/one-on',
-                'name' => 'включение клапана 1',
-                'working_minutes' => 90,
-                'type' => 'scenario',
-                'id_in_db' => 11,
-                'time_at' => '16:10:00',
-            ],
-            [ // ending life cycle , turn-off all swifts
-                'topic' => 'smart-watering/major-off',
-                'name' => 'отключение полива',
-                'working_minutes' => 1,
-                'type' => 'scenario',
-                'id_in_db' => 12,
                 'time_at' => null,
             ],
         ];

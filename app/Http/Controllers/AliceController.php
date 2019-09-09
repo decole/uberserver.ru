@@ -4,44 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Alice;
 use App\AliceSecure;
+use App\Helpers\MqttHelper;
+use App\Helpers\TelegramHelper;
 use App\Weather;
 use Illuminate\Http\Request;
 
 class AliceController extends Controller
 {
-    public function actionIndex(): array
+    public function actionIndex()
     {
         $apiRequestArray = json_decode(trim(file_get_contents('php://input')), true);
         $text = $this->process($apiRequestArray);
         $arrayToEncode = [
-            "response" => [
-                "text" => htmlspecialchars_decode($text),
-                "end_session" => false,
+            'response' => [
+                'text' => htmlspecialchars_decode($text),
+                'tts'  => htmlspecialchars_decode($text),
+                'buttons' => [],
+                'end_session' => false,
             ],
-            "session" => [
-                "session_id" => $apiRequestArray['session']['session_id'],
-                "message_id" => $apiRequestArray['session']['message_id'],
-                "user_id" => $apiRequestArray['session']['user_id'],
+            'session' => [
+                'session_id' => $apiRequestArray['session']['session_id'],
+                'message_id' => $apiRequestArray['session']['message_id'],
+                'user_id' => $apiRequestArray['session']['user_id'],
             ],
-            "version" => $apiRequestArray['version']
+            'version' => $apiRequestArray['version']
         ];
 
         return response()->json($arrayToEncode);
-//        return response()->json([
-//            'name' => 'Abigail',
-//            'state' => 'CA'
-//        ]);
-//        https://laravel.ru/docs/v5/responses
+
     }
 
     /**
      * обработчик присылаемых команд
      *
      * @param $apiRequestArray
-     * @return string
+     * @return mixed
      */
-    private function process($apiRequestArray): ?string
+    private function process($apiRequestArray)
     {
+
         if($this->secure($apiRequestArray) === false){
             return 'Вы не зарегистрированный пользователь.';
         }
@@ -201,8 +202,7 @@ class AliceController extends Controller
      */
     private function weather($text): string
     {
-        $acuweth = Weather::find()->orderBy(['date' => SORT_DESC])->one();
-        return 'Температура ' . $acuweth->temperature . ' С`- ' . $acuweth->spec;
+        return Weather::getWeather();
 
     }
 
@@ -247,7 +247,7 @@ class AliceController extends Controller
      */
     private function error(): string
     {
-        return 'Ошибка';
+        return 'Хм';
     }
 
     /**
@@ -301,12 +301,13 @@ class AliceController extends Controller
 
     }
 
-    /**
-     * Уничтожение данных и отключение всех сенсоров
-     *
-     * @param $apiRequestArray
-     * @return string
-     */
+//    /**
+//     * Уничтожение данных и отключение всех сенсоров
+//     *
+//     * @param $apiRequestArray
+//     * @return string
+//     */
+    /*
     private function destroy($apiRequestArray): string
     {
         $aliceSecure = new AliceSecure();
@@ -314,32 +315,34 @@ class AliceController extends Controller
         return 'destroy - is set...';
 
     }
+    */
 
-    /**
-     * Заблокировать всех зарегистрированных пользователей
-     *
-     * @param $apiRequestArray
-     * @return string
-     */
-    private function blocking($apiRequestArray): string
-    {
-        $aliceSecure = new AliceSecure();
-        $aliceSecure->blocking();
-        return 'blocking - ok';
+//    /**
+//     * Заблокировать всех зарегистрированных пользователей
+//     *
+//     * @param $apiRequestArray
+//     * @return string
+//     */
+//    private function blocking($apiRequestArray): string
+//    {
+//        $aliceSecure = new AliceSecure();
+//        $aliceSecure->blocking();
+//        return 'blocking - ok';
+//
+//    }
 
-    }
+//    /**
+//     * Команда для создания резерной копии проекта
+//     *
+//     * @param $apiRequestArray
+//     * @return string
+//     */
+//    private function backup($apiRequestArray): string
+//    {
+//        $aliceSecure = new AliceSecure();
+//        $aliceSecure->backup();
+//        return 'backup - ok';
+//
+//    }
 
-    /**
-     * Команда для создания резерной копии проекта
-     *
-     * @param $apiRequestArray
-     * @return string
-     */
-    private function backup($apiRequestArray): string
-    {
-        $aliceSecure = new AliceSecure();
-        $aliceSecure->backup();
-        return 'backup - ok';
-
-    }
 }

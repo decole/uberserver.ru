@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\HistoryRelayState;
+use App\Relays;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -55,6 +57,12 @@ class Hello extends Command
 //
 //            Cache::put($key, $value, $expiresAt);
 //        }
+//        $id = 1;
+//        $value = '0';
+//
+//        Relays::where('id', $id)->update(['state' => $value]);
+//
+//        HistoryRelayState::historySave($id, $value);
 
     }
 

@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 use App\HistoryRelayState;
 use App\MqttPayload;
+use App\Relays;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -220,11 +221,14 @@ class MqttHelper extends BaseController
             $value = 0;
         }
 
-        $relay = DB::table('relays')
-            ->where('id', $id)
-            ->update(['state' => $value]);
+//        DB::table('relays')
+//            ->where('id', $id)
+//            ->update(['state' => $value]);
+
+        Relays::where('id', $id)->update(['state' => $value]);
 
         HistoryRelayState::historySave($id, $value);
+
     }
 
 
@@ -391,7 +395,7 @@ class MqttHelper extends BaseController
                 . str_replace('.0','', $this->getCacheMqtt('margulis/temperature'))    . ', ';
             $string .= 'В низах: '
                 . str_replace('.0','', $this->getCacheMqtt('underflor/temperature'))   . ', ';
-            $string .= 'Под низах: '
+            $string .= 'Под низами: '
                 . str_replace('.0','', $this->getCacheMqtt('underground/temperature')) . '.'.PHP_EOL;
             return $string;
         }

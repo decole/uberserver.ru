@@ -43,7 +43,7 @@ class AliceSecure extends Model
      */
     public function registerUser($id)
     {
-        if(static::find()->where(['user_id' => $id])->one() === null) {
+        if(self::where(['user_id' => $id])->first() === null) {
             $model = new self();
             $model->user_id = $id;
             $model->valid = 1;
@@ -58,7 +58,7 @@ class AliceSecure extends Model
      */
     public static function validateUser($id)
     {
-        $validate = static::find()->where(['user_id' => $id])->one();
+        $validate = self::where(['user_id' => $id])->first();
         return !($validate === null);
 
     }
@@ -70,7 +70,7 @@ class AliceSecure extends Model
     public static function isAdmin($id)
     {
         $admin = self::getValidStatus()['ADMIN'];
-        $validate = static::find()->where(['user_id' => $id, 'valid' => $admin])->one();
+        $validate = self::where(['user_id' => $id, 'valid' => $admin])->first();
         return !($validate === null);
 
     }

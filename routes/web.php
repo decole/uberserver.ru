@@ -35,7 +35,7 @@ Route::get('/chart', 'SensorsController@chartShow');
 
 Route::get('/api/chart', 'SensorsController@chartShowGet');
 
-
+Route::any('/alice', 'AliceController@actionIndex');
 
 Route::get('/alarm', function () {
     return view('index', [

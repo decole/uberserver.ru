@@ -16,6 +16,7 @@ class WaterController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+
     }
 
     /**
@@ -23,7 +24,7 @@ class WaterController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showSwifts()
+    public function showSwifts(Request $request)
     {
         $sensors = Relays::all();
 
@@ -39,6 +40,7 @@ class WaterController extends Controller
         return view('watering', [
                 'page_title' => 'Данные сенсоров',
                 'ralays' =>$sensors,
+                'sidebar'    => $request->sideBarComponent,
             ]
         );
 

@@ -45,6 +45,10 @@
                                             <p>Why not buy a new awesome theme?</p>
                                         </a>
                                     </li>
+                                    <li>
+                                        <p>use midleware 'SideBar' at massive $sideBarComponent in folder @midleware@</p>
+                                        <p> is user id = {{ $sidebar['user_id']  }}</p>
+                                    </li>
                                     <!-- end message -->
                                 </ul>
                                 <!-- /.menu -->

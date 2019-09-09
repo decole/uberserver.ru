@@ -15,6 +15,7 @@ class SiteController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('sidebar');
     }
 
     public function index(Request $request)
@@ -70,6 +71,7 @@ class SiteController extends Controller
             'page_title' => 'Start Page',
             'speech'     => $speech,
             'actions'    => $driving,
+            'sidebar'    => $request->sideBarComponent,
         ]);
     }
 }

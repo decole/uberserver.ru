@@ -65,6 +65,7 @@ class Schedule extends Model
      */
     public static function aliceStartScheduleWatering(): string
     {
+        /*
         $model = new self;
         $waterLogic = new WateringHelper();
         $options = $waterLogic::listTimers();
@@ -82,6 +83,7 @@ class Schedule extends Model
                 $timer += $parameter['working_minutes'];
             }
         }
+        */
 
         return true;
     }
@@ -91,7 +93,7 @@ class Schedule extends Model
      *
      * @return string
      */
-    public static function aliceStopScheduleWatering(): string
+    public static function aliceStopScheduleWatering(): void
     {
         $model = new self;
         $waterLogic = new WateringHelper();
@@ -102,11 +104,11 @@ class Schedule extends Model
         }
         $waterLogic->stopAll();
 
-        return 'Планировщик остановлен. Полив отсключен'.PHP_EOL;
+        //return 'Планировщик остановлен. Полив отсключен'.PHP_EOL;
     }
 
     /**
-     *
+     * changing time in DB of id
      *
      * @var \App\Schedule $taskModel
      * @param $task
@@ -114,9 +116,8 @@ class Schedule extends Model
      */
     private function changeTimer($taskId, $date): void
     {
-        $taskModel = self::where(['id' => $taskId])->first();
-        $taskModel->next_run = $date;
-        $taskModel->save();
+        self::where(['id' => $taskId])
+            ->update(['next_run' => $date]);
 
     }
 

@@ -27,19 +27,9 @@ class Alice extends Model
      */
     protected $table = 'alice';
 
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'session_id' => 'Session ID',
-            'user_id' => 'User ID',
-            'command' => 'Command',
-            'tokens' => 'Tokens',
-            'json' => 'Json',
-            'create_date' => 'Create Date',
-        ];
-    }
-
+    /**
+     * @param $apiRequestArray
+     */
     public function saveDialog($apiRequestArray)
     {
         $assistant = new self();
@@ -120,7 +110,7 @@ class Alice extends Model
     {
         // планировщик все таски полива в null
         Schedule::aliceStopScheduleWatering();
-        return 'Планировщик событий остановил сценарий полива. Автополив сейчас будет отключен.';
+        return 'Планировщик событий остановил сценарий полива. Автополив сейчас отключен.';
 
     }
 

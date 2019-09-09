@@ -38,6 +38,16 @@ class Kernel extends ConsoleKernel
 //            ->cron('*/3 * * * *');
         $schedule->command('mqtt:checkOnline')
             ->cron('*/3 * * * *');
+        $schedule->command('weather:index')
+            ->cron('2  */1 * * *');
+        $schedule->command('weather:index')
+            ->cron('30 */1 * * *');
+        $schedule->command('mqtt:save')
+            ->cron('30 */1 * * *');
+        $schedule->command('telegram:weather')
+            ->cron('1  7   * * *');
+        $schedule->command('schedule run')
+            ->cron('* * * * *');
 
     }
 

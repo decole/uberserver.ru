@@ -29,7 +29,7 @@ class SensorsController extends Controller
      *
      * @var Weather $acuweather
      */
-    public function showSensors()
+    public function showSensors(Request $request)
     {
         $timeLineW = Weather::max('date');
         $acuweather = Weather::where(['date' => "$timeLineW"])->first();
@@ -48,15 +48,17 @@ class SensorsController extends Controller
                 ],
                 'acuweather' => $acuweather,
                 'max' => $timeLineW,
+                'sidebar'    => $request->sideBarComponent,
             ]
         );
 
     }
 
-    public function chartShow()
+    public function chartShow(Request $request)
     {
         return view('charts', [
                 'page_title' => 'Данные сенсоров',
+                'sidebar'    => $request->sideBarComponent,
             ]
         );
 
