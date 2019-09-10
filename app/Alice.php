@@ -43,6 +43,8 @@ class Alice extends Model
     }
 
     /**
+     * Состояние датчиков
+     *
      * @var MqttHelper $mqtt
      * @return string
      */
@@ -85,6 +87,11 @@ class Alice extends Model
         return 'Общий статус: ' . $stateAll . PHP_EOL . $request;
     }
 
+    /**
+     * Состояние полива, на текущий момент
+     *
+     * @return string
+     */
     public function stateSmartWatering()
     {
         $watering = new WateringHelper();
@@ -92,6 +99,11 @@ class Alice extends Model
         return $watering->wateringState();
     }
 
+    /**
+     * Состояние сенсоров
+     *
+     * @return string
+     */
     public function stateSensors()
     {
         $mqtt = new MqttHelper();
@@ -99,21 +111,41 @@ class Alice extends Model
         return $request;
     }
 
+    /**
+     * Запуск восстановления сценариев планировщика задач. Часто бывает когда выключают электричество, ПК через ИБП
+     * опрашивает отключенные датчкики и null-ит все задачи по поливу. Приходится заново запускать.
+     *
+     * @return string
+     */
     public function startScheduleWatering()
     {
-        Schedule::aliceStartScheduleWatering();
-        return 'Запущен цикл автополива.';
+//        Schedule::aliceStartScheduleWatering();
+//        return 'Запущен цикл автополива.';
+        return 'Нынче не сезон. Система не поддерживается';
 
     }
 
+    /**
+     * Останов сценариев полива. Бывает что  жене нужно прямо здесь и сейчас сделать то, что не возможно.
+     *
+     * @return string
+     */
     public function stopScheduleWatering()
     {
         // планировщик все таски полива в null
-        Schedule::aliceStopScheduleWatering();
-        return 'Планировщик событий остановил сценарий полива. Автополив сейчас отключен.';
+//        Schedule::aliceStopScheduleWatering();
+//        return 'Планировщик событий остановил сценарий полива. Автополив сейчас отключен.';
+        return 'Нынче не сезон. Система не поддерживается';
 
     }
 
+    /**
+     * Включение отходящего шланга на центральном клапане. Не включать если неизвестно состояние крана шланга.
+     * При закрытом кране, вода не льется через шланг и нагнетается давление на центральном клапане.
+     * !! Возможна протечка.
+     *
+     * @return string
+     */
     public function hoseOn()
     {
         $watering = new WateringHelper();
@@ -122,6 +154,11 @@ class Alice extends Model
 
     }
 
+    /**
+     * Выключение шланга
+     *
+     * @return string
+     */
     public function hoseOff()
     {
         $watering = new WateringHelper();
@@ -130,6 +167,11 @@ class Alice extends Model
 
     }
 
+    /**
+     * Аварийный останов
+     *
+     * @return string
+     */
     public function alarmOn()
     {
         $watering = new WateringHelper();

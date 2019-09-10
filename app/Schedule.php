@@ -7,6 +7,9 @@ use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * Класс реализыет динамический планировщик задач для процессов, которым необходимо гибко реагировать на внешнее
+ * воздействие.
+ *
  * This is the model class for table "schedule".
  *
  * @property int     $id
@@ -91,7 +94,7 @@ class Schedule extends Model
     /**
      * Алиса остановит планировщик автополива
      *
-     * @return string
+     * @return void
      */
     public static function aliceStopScheduleWatering(): void
     {
@@ -104,7 +107,6 @@ class Schedule extends Model
         }
         $waterLogic->stopAll();
 
-        //return 'Планировщик остановлен. Полив отсключен'.PHP_EOL;
     }
 
     /**

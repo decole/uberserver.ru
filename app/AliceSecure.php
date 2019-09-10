@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,8 +11,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $user_id
  * @property int $valid
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
  */
 class AliceSecure extends Model
 {
@@ -22,9 +21,11 @@ class AliceSecure extends Model
      */
     protected $table = 'alice_secure';
 
+    public $timestamps = false; // отключаем created_at и updated_at http://laravel.su/docs/5.4/eloquent
+
     const BLOCKED = 'Заблокирован';
-    const VALID = 'Зарегистрирован';
-    const ADMIN = 'Админ';
+    const VALID   = 'Зарегистрирован';
+    const ADMIN   = 'Админ';
 
     public static function getValidStatus()
     {
@@ -40,9 +41,13 @@ class AliceSecure extends Model
      * Добавление пользователся в доверенную зону
      *
      * @param $id
+     * @return void
      */
     public function registerUser($id)
     {
+//        $model = self::where(['user_id' => $id])->first();
+//        var_dump($model);
+
         if(self::where(['user_id' => $id])->first() === null) {
             $model = new self();
             $model->user_id = $id;
@@ -69,8 +74,8 @@ class AliceSecure extends Model
      */
     public static function isAdmin($id)
     {
-        $admin = self::getValidStatus()['ADMIN'];
-        $validate = self::where(['user_id' => $id, 'valid' => $admin])->first();
+        $admin = self::getValidStatus();
+        $validate = self::where(['user_id' => $id, 'valid' => $admin[self::ADMIN]])->first();
         return !($validate === null);
 
     }

@@ -14,9 +14,11 @@ class TeleBotController extends Controller
     private $commands_paths;
 
     /**
+     * @param Request $request
      * @return string
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function webhook()
+    public function webhook(Request $request)
     {
         $bot = new TelegramHelper();
         return $bot->getHook();

@@ -19,12 +19,14 @@ class TelegramHelper extends BaseController
     private $commands_paths;
     private $admin_users;
     private $mysql_credentials;
+    private $hookUrl;
 
     /**
      * TelegramHelper constructor.
      */
     public function __construct()
     {
+        $this->hookUrl = env('TELEGRAM_HOOK_URL');
         $this->bot_username = env('TELEGRAM_BOT_NAME');
         $this->token = env('TELEGRAM_BOT_TOKEN');
         $this->users = [
@@ -142,34 +144,51 @@ class TelegramHelper extends BaseController
 
     /**
      * get updates from hook
+     *
+     * @param Request $request
      * @return string
      */
     public function getHook()
     {
         try {
-            // Create Telegram API object
-            // Add commands paths containing your custom commands
-            $this->api->addCommandsPaths($this->commands_paths);
-            $this->api->enableAdmins($this->admin_users);
-            // Requests Limiter (tries to prevent reaching Telegram API limits)
-            $this->api->enableLimiter();
-            // Handle telegram webhook request
-            $this->api->handle();
-        } catch (Longman\TelegramBot\Exception\TelegramException $e) {
-            // Silence is golden!
-            //echo $e;
+            /** @var Telegram $telegram */
+            $telegram = $this->telegram;
+            $telegram->setCommandConfig('weather', ['owm_api_key' => 'hoArfRosT1215']);
+            $telegram->addCommandsPaths($this->commands_paths);
+            $telegram->enableAdmins($this->admin_users);
+            $telegram->useGetUpdatesWithoutDatabase();
+            $telegram->enableLimiter();
+            $telegram->handle();
+        } catch (TelegramException $e) {
+            echo $e->getMessage();
             // Log telegram errors
-            Longman\TelegramBot\TelegramLog::error($e);
-        } catch (Longman\TelegramBot\Exception\TelegramLogException $e) {
-            // Silence is golden!
-            // Uncomment this to catch log initialisation errors
-            //echo $e;
+            //TelegramLog::error($e);
+            Log::channel('telegramBot')->error($e);
         }
-        return 'hook';
+        return 'web-hook';
     }
 
+    /**
+     * set webhook from telegram.org
+     *
+     * @return string
+     * @throws TelegramException
+     */
     public function setHook()
     {
+        try {
+            // Create Telegram API object
+            $telegram = $this->telegram;
+
+            // Set webhook
+            $result = $telegram->setWebhook($this->hookUrl);
+            if ($result->isOk()) {
+                return $result->getDescription();
+            }
+        } catch (TelegramException $e) {
+            // log telegram errors
+            // echo $e->getMessage();
+        }
         return 'set hook';
     }
 

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 class Weather extends Model
 {
     /**
-     * Таблица, связанная с моделью.
+     * Таблица, связанная с моделью погоды
      *
      * @var string
      */

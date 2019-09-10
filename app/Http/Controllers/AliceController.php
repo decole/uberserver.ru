@@ -11,6 +11,17 @@ use Illuminate\Http\Request;
 
 class AliceController extends Controller
 {
+    private $validUser;
+    private $isAdmin;
+    private $user_id;
+
+    public function __construct()
+    {
+        $this->validUser  = false;
+        $this->isAdmin = false;
+        $this->user_id = false;
+    }
+
     public function actionIndex()
     {
         $apiRequestArray = json_decode(trim(file_get_contents('php://input')), true);
@@ -47,7 +58,6 @@ class AliceController extends Controller
             return 'Вы не зарегистрированный пользователь.';
         }
 
-
         $tokens = $apiRequestArray['request']['nlu']['tokens'];
         $commands = [
             'привет'  => 'hello',
@@ -80,7 +90,6 @@ class AliceController extends Controller
                 return $this->$value($tokens);
             }
         }
-
 
         return $this->error();
 
@@ -184,10 +193,10 @@ class AliceController extends Controller
     /**
      * Аварийный останов полива
      *
-     * @param $text
+     * @param $tokens
      * @return string
      */
-    private function alarmOn($text): string
+    private function alarmOn($tokens): string
     {
         $alice = new Alice();
         return $alice->alarmOn();
@@ -197,10 +206,10 @@ class AliceController extends Controller
     /**
      * Вывод погоды из базы данных
      *
-     * @param $text
+     * @param $tokens
      * @return string
      */
-    private function weather($text): string
+    private function weather($tokens): string
     {
         return Weather::getWeather();
 
@@ -210,7 +219,7 @@ class AliceController extends Controller
      * Активация шланга - муфта со шлангом подсоединена к главному клапану, при его активации появится давление в ветке
      * со шлангом
      *
-     * @param $text
+     * @param $tokens
      * @return string
      */
     private function hose($tokens): string
@@ -222,7 +231,11 @@ class AliceController extends Controller
             in_array('запустить', $tokens) ||
             in_array('стартовать', $tokens)
         ) {
-            return $alice->hoseOn();
+            if($this->isAdmin) {
+                return $alice->hoseOn();
+            }
+
+            return 'У вас нет прав на это действие';
         }
 
         if(
@@ -235,7 +248,11 @@ class AliceController extends Controller
             return $alice->hoseOff();
         }
 
-        return $alice->hoseOn();
+        if($this->isAdmin) {
+            return $alice->hoseOn();
+        }
+
+        return 'У вас нет прав на это действие';
 
     }
 
@@ -296,8 +313,11 @@ class AliceController extends Controller
             $security->registerUser($userId);
             return true;
         }
+        $this->validUser = AliceSecure::validateUser($userId);
+        $this->isAdmin   = AliceSecure::isAdmin($userId);
+        $this->user_id   = $userId;
 
-        return AliceSecure::validateUser($userId);
+        return $this->validUser;
 
     }
 

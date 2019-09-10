@@ -24,6 +24,7 @@ class HistoryRelayState extends Model
         $model->topic = Relays::where('id', $id)->first()->topic;
         $model->state = $value;
         $model->save();
+
     }
 
 }
