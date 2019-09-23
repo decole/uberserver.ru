@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class MqttHelper extends BaseController
 {
-    public $host = '192.168.1.5';
-    public $port = 1883;
+    public $host;
+    public $port;
     public $time = 60;
     private $client;
     private $isConnect = false;
@@ -21,6 +21,8 @@ class MqttHelper extends BaseController
 
     public function __construct()
     {
+        $this->host = env('MQTT_SERVER_IP');
+        $this->port = env('MQTT_SERVER_PORT');
         $this->client = new \Mosquitto\Client();
         $this->client->connect($this->host, $this->port, 5);
         // https://mosquitto-php.readthedocs.io/en/latest/client.html#Mosquitto\Client::onConnect

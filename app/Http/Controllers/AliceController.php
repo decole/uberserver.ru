@@ -14,12 +14,14 @@ class AliceController extends Controller
     private $validUser;
     private $isAdmin;
     private $user_id;
+    private $end_session;
 
     public function __construct()
     {
         $this->validUser  = false;
         $this->isAdmin = false;
         $this->user_id = false;
+        $this->end_session = false;
     }
 
     public function actionIndex()
@@ -31,7 +33,7 @@ class AliceController extends Controller
                 'text' => htmlspecialchars_decode($text),
                 'tts'  => htmlspecialchars_decode($text),
                 'buttons' => [],
-                'end_session' => false,
+                'end_session' => $this->end_session,
             ],
             'session' => [
                 'session_id' => $apiRequestArray['session']['session_id'],
@@ -82,6 +84,11 @@ class AliceController extends Controller
             //'самоуничтожение' => 'destroy', // уничтожить данные и заморозить сервисы, отключить всю электронику
             'заблокировать' => 'blocking',  // заблокировать всех пользователей, на случай взлома
             //'резервная' => 'backup',        // резервная копия базы
+
+            'свет'       => 'lamp',
+            'лампа'      => 'lamp',
+            'лампу'      => 'lamp',
+            'освещение'  => 'lamp',
         ];
 
         foreach ($commands as $key=>$value) {
@@ -117,6 +124,7 @@ class AliceController extends Controller
      */
     private function ping($text): string
     {
+        $this->end_session = true;
         return 'pong';
 
     }
@@ -185,6 +193,7 @@ class AliceController extends Controller
         ) {
             return $alice->stopScheduleWatering();
         }
+        $this->end_session = true;
 
         return 'Уточните, сказав: "Планировщик старт" или "Планировщик стоп"';
 
@@ -198,6 +207,7 @@ class AliceController extends Controller
      */
     private function alarmOn($tokens): string
     {
+        $this->end_session = true;
         $alice = new Alice();
         return $alice->alarmOn();
 
@@ -211,6 +221,7 @@ class AliceController extends Controller
      */
     private function weather($tokens): string
     {
+        $this->end_session = true;
         return Weather::getWeather();
 
     }
@@ -252,6 +263,44 @@ class AliceController extends Controller
             return $alice->hoseOn();
         }
 
+        $this->end_session = true;
+
+        return 'У вас нет прав на это действие';
+
+    }
+
+    /**
+     * Включение светильника в пристройке. Первый опыт с освещением. Я такое не приветствую, больше сложностей
+     *
+     * @param $tokens
+     * @return string
+     */
+    private function lamp($tokens): string
+    {
+        $alice = new Alice();
+        if(
+            in_array('включи', $tokens) ||
+            in_array('включить', $tokens)
+
+        ) {
+//            if($this->isAdmin) {
+                return $alice->lampOn();
+//            }
+
+//            return 'У вас нет прав на это действие';
+        }
+
+        if(
+            in_array('выключить', $tokens) ||
+            in_array('выключи', $tokens)
+        ) {
+            return $alice->lampOff();
+        }
+
+//        if($this->isAdmin) {
+//            return $alice->hoseOn();
+//        }
+        $this->end_session = true;
         return 'У вас нет прав на это действие';
 
     }

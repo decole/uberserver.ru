@@ -108,7 +108,9 @@ class Alice extends Model
     {
         $mqtt = new MqttHelper();
         $request = $mqtt->sensorStatus('alice');
+
         return $request;
+
     }
 
     /**
@@ -150,6 +152,7 @@ class Alice extends Model
     {
         $watering = new WateringHelper();
         $watering->MajorOn();
+
         return 'Центральный клапан включен. Шланг запитан.';
 
     }
@@ -163,6 +166,7 @@ class Alice extends Model
     {
         $watering = new WateringHelper();
         $watering->MajorOff();
+
         return 'Центральный клапан выключен. Шланг не запитан.';
 
     }
@@ -176,7 +180,28 @@ class Alice extends Model
     {
         $watering = new WateringHelper();
         $watering->AlarmOn();
+
         return 'Все клапаны автополива аварийно отключены. Вы можете проверить это сказав: Общий статус.';
+
+    }
+
+    // @Todo сделать как надо!!!
+    public function lampOn()
+    {
+        $mqtt = new MqttHelper();
+        $mqtt->post('margulis/lamp01', 'on');
+
+        return 'Освещение включено';
+
+    }
+
+    // @Todo сделать как надо!!!
+    public function lampOff()
+    {
+        $mqtt = new MqttHelper();
+        $mqtt->post('margulis/lamp01', 'off');
+
+        return 'Освещение выключено';
 
     }
 
