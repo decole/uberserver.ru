@@ -80,6 +80,47 @@
             </div><!-- /.info-box -->
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-sitemap"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Зал</span>
+                    <span class="info-box-number">t.
+                        <span class="sensor-state" data-topic="home/hall/temperature">
+                            {{ $sensors['home_hall_temperature'] }}
+                        </span> &#8451;
+                    </span>
+                </div><!-- /.info-box-content -->
+            </div><!-- /.info-box -->
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-sitemap"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Кухня</span>
+                    <span class="info-box-number">t.
+                        <span class="sensor-state" data-topic="home/kitchen/temperature">
+                            {{ $sensors['home_kitchen_temperature'] }}
+                        </span> &#8451;
+                    </span>
+                </div><!-- /.info-box-content -->
+            </div><!-- /.info-box -->
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-sitemap"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Ванная</span>
+                    <span class="info-box-number">t.
+                        <span class="sensor-state" data-topic="home/restroom/temperature">
+                            {{ $sensors['home_restroom_temperature'] }}
+                        </span> &#8451;
+                    </span>
+                </div><!-- /.info-box-content -->
+            </div><!-- /.info-box -->
+        </div>
+    </div>
     <div class='row'>
     <div class='col-md-6'>
         <!-- Box -->

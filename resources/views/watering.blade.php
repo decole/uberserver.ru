@@ -14,6 +14,9 @@
     {
         background-color: green;
     }
+    .small-box>.small-box-footer {
+        cursor: pointer;
+    }
 </style>
 <div class="row">
     @foreach ($ralays as $key=>$value)

@@ -19,13 +19,11 @@
             <!-- Sidebar Menu -->
             <ul class="sidebar-menu" data-widget="tree">
                 <li class="header">Основное</li>
-                <!-- Optionally, you can add icons to the links -->
                 <li class="{{ (request()->is('/')) ? 'active' : '' }}"><a href="/"><i class="fa fa-shirtsinbulk"></i> <span>Main</span></a></li>
                 <li class="{{ (request()->is('sensors*')) ? 'active' : '' }}"><a href="/sensors"><i class="fa fa-dashboard"></i> <span>Sensors</span></a></li>
                 <li class="{{ (request()->is('watering*')) ? 'active' : '' }}"><a href="/watering"><i class="fa fa-dashboard"></i> <span>Watering</span></a></li>
+                <li class="{{ (request()->is('home_swifts*')) ? 'active' : '' }}"><a href="/home_swifts"><i class="fa fa-dashboard"></i> <span>Swifts</span></a></li>
                 <li class="{{ (request()->is('chart*')) ? 'active' : '' }}"><a href="/chart"><i class="fa fa-bar-chart"></i> <span>Charts</span></a></li>
-{{--                <li class="{{ (request()->is('alarm*')) ? 'active' : '' }}"><a href="/alarm"><i class="fa fa-warning"></i> <span>Alarm</span></a></li>--}}
-                {{--<li><a href="/login"><i class="fa fa-link"></i> <span>login</span></a></li>--}}
                 <li><a href="https://blog.uberserver.ru/"><i class="fa fa-link"></i> <span>Blog</span></a></li>
             </ul>
             <!-- /.sidebar-menu -->

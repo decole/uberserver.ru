@@ -3,6 +3,19 @@ function re(data) {
     if (data == 1) return "on";
 }
 
+function clearNotify() {
+    $('span.label.label-warning.notifyIconInfo').remove();
+    $.get("/api/notifySite?action=clear&value=all", function (data) {
+        if (data === 'ok') {
+            $('ul.menu').remove();
+            $("ul.dropdown-menu>li.header").html('You have 0 notifications');
+        }
+        if (data !== 'ok') {
+            alert('warning, note clear notify!');
+        }
+    });
+}
+
 $(document).ready(function () {
     $(".relay-control[data-id]").click(function () {
         let $this = $(this);
@@ -172,8 +185,26 @@ $(document).ready(function () {
                 $(value).html(data);
             });
         });
-        setTimeout(stateSensors, 10000);
+        setTimeout(stateSensors, 20000);
     }
 
     stateSensors();
+
+    $(".timer-click").click(function () {
+        const parent = $(this).parent();
+        const el = $(this);
+        let id = parent.data("id");
+        let minutes = parent.find( "select" ).val();
+        // https://uberserver.ru/api/addTimer?id=1&minutes=30
+        $.get("/api/addTimer?id="+id+"&minutes="+minutes, function (data) {
+            console.log(data);
+            if (data == 'ok') {
+                parent.removeClass("bg-yellow").removeClass("bg-red").addClass("bg-green");
+                parent.find( "p.boiler-timer" ).text('on');
+                el.remove();
+            }
+        });
+    });
+
+
 });

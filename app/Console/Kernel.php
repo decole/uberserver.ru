@@ -45,8 +45,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('mqtt:save')
             ->cron('30 */1 * * *');
         $schedule->command('telegram:weather')
-            ->cron('1  7   * * *');
-        $schedule->command('schedule run')
+            ->cron('1 7 * * *');
+        $schedule->command('send:log')
+            ->cron('58 23 * * *');
+        $schedule->command('timer:start')
             ->cron('* * * * *');
 
     }

@@ -7,7 +7,6 @@ use App\Relays;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class MqttHelper extends BaseController
 {
@@ -19,13 +18,14 @@ class MqttHelper extends BaseController
     private $alarmTemper = 43;
     private $periodicTime = 1800; // период произведения анализа в методе process
 
+// https://mosquitto-php.readthedocs.io/en/latest/client.html#Mosquitto\Client::onConnect
     public function __construct()
     {
         $this->host = env('MQTT_SERVER_IP');
         $this->port = env('MQTT_SERVER_PORT');
         $this->client = new \Mosquitto\Client();
         $this->client->connect($this->host, $this->port, 5);
-        // https://mosquitto-php.readthedocs.io/en/latest/client.html#Mosquitto\Client::onConnect
+
         $this->client->onConnect(function ($rc){
             if($rc === 0){
                 $this->isConnect = true;
@@ -61,6 +61,7 @@ class MqttHelper extends BaseController
     {
         $this->client->publish($topic, $data, 1, 0);
         return $data;
+
     }
 
     /**
@@ -71,6 +72,7 @@ class MqttHelper extends BaseController
         if($this->isConnect){
             $this->client->disconnect();
         }
+
     }
 
     /**
@@ -179,9 +181,6 @@ class MqttHelper extends BaseController
         if(($options['format'] === 'leakage') && ($message->payload == $options['condition']['warning'])) {
             $this->post('water/alarm', '1');
             $this->mailing($options['message']($message->payload), $options);
-
-            sleep(1);
-            $this->post('water/alarm', '0');
         }
 
     }
@@ -197,7 +196,6 @@ class MqttHelper extends BaseController
     {
         if (isset($options['condition']['on'], $options['condition']['off']) ) {
             if ($message->payload == 0 || $message->payload == 1) {
-                // safe new state swift
                 $this->saveState($options['RelayID'], $message->payload);
             }
             else {
@@ -222,13 +220,7 @@ class MqttHelper extends BaseController
         if($value == 'off') {
             $value = 0;
         }
-
-//        DB::table('relays')
-//            ->where('id', $id)
-//            ->update(['state' => $value]);
-
         Relays::where('id', $id)->update(['state' => $value]);
-
         HistoryRelayState::historySave($id, $value);
 
     }
@@ -475,6 +467,7 @@ class MqttHelper extends BaseController
      */
     public static function listTopics(): array
     {
+        //$sensorName = MqttPayload::getSwiftNames();
         return [
             'underflor/temperature' => [ // низа температура
                 'condition' => [ // пороговые значения min max
@@ -580,6 +573,45 @@ class MqttHelper extends BaseController
                 'format' => '%',
                 'type' => 'sensor',
             ],
+            'home/kitchen/temperature' => [ // кухня температура
+                'condition' => [
+                    'min' => 15,
+                    'max' => 35,
+                ],
+                'message' => function($value){
+                    return 'критичная температура в кухне !!! - ' . $value . '°C';
+                },
+                'sensorName' => 'кухня',//$sensorName,
+                'users' => ['decole', 'luda'],
+                'format' => '°C',
+                'type' => 'sensor',
+            ],
+            'home/restroom/temperature' => [ // ванная температура
+                'condition' => [
+                    'min' => 15,
+                    'max' => 35,
+                ],
+                'message' => function($value){
+                    return 'критичная температура в ванной !!! - ' . $value . '°C';
+                },
+                'sensorName' => 'ванна',//$sensorName,
+                'users' => ['decole', 'luda'],
+                'format' => '°C',
+                'type' => 'sensor',
+            ],
+            'home/hall/temperature' => [ // зал температура
+                'condition' => [
+                    'min' => 15,
+                    'max' => 35,
+                ],
+                'message' => function($value){
+                    return 'критичная температура в зале !!! - ' . $value . '°C';
+                },
+                'sensorName' => 'зал',// $sensorName[MqttPayload::SENSOR_HOME_HALL_TEMPERATURE],
+                'users' => ['decole', 'luda'],
+                'format' => '°C',
+                'type' => 'sensor',
+            ],
             // sensor from smart watering
             'water/leakage' => [ // датчик протечки воды
                 'condition' => [
@@ -604,7 +636,7 @@ class MqttHelper extends BaseController
                 'message' => function($value){
                     return 'Состояние главного клапана неизвестно!';
                 },
-                'sensorName' => MqttPayload::SENSOR_WATER_LEAKAGE,
+                'sensorName' => MqttPayload::SWIFT_WATER_MAJOR,
                 'users' => ['decole', 'luda'],
                 'linked' => 'watering', // привязано к автополиву и WateringLogic
                 'format' => 'check',
@@ -618,7 +650,7 @@ class MqttHelper extends BaseController
                 'message' => function($value){
                     return 'Состояние клапана №1 неизвестно!';
                 },
-                'sensorName' => MqttPayload::SENSOR_WATER_LEAKAGE,
+                'sensorName' => MqttPayload::SWIFT_WATER_1,
                 'users' => ['decole', 'luda'],
                 'linked' => 'watering', // привязано к автополиву и WateringLogic
                 'format' => 'check',
@@ -632,7 +664,7 @@ class MqttHelper extends BaseController
                 'message' => function($value){
                     return 'Состояние клапана №2 неизвестно!';
                 },
-                'sensorName' => MqttPayload::SENSOR_WATER_LEAKAGE,
+                'sensorName' => MqttPayload::SWIFT_WATER_2,
                 'users' => ['decole', 'luda'],
                 'linked' => 'watering', // привязано к автополиву и WateringLogic
                 'format' => 'check',
@@ -646,9 +678,51 @@ class MqttHelper extends BaseController
                 'message' => function($value){
                     return 'Состояние клапана №3 неизвестно!';
                 },
-                'sensorName' => MqttPayload::SENSOR_WATER_LEAKAGE,
+                'sensorName' => MqttPayload::SWIFT_WATER_3,
                 'users' => ['decole', 'luda'],
                 'linked' => 'watering', // привязано к автополиву и WateringLogic
+                'format' => 'check',
+                'type' => 'sensor',
+            ],
+            'margulis/check/lamp01' => [ // датчик протечки воды
+                'condition' => [
+                    'normal'  => 0, // 1 - датчик = нет протечки
+                    'warning' => 1,
+                ],
+                'message' => function($value){
+                    return 'Состояние клапана №3 неизвестно!';
+                },
+                'sensorName' => MqttPayload::SWIFT_LAMP01,
+                'users' => ['decole', 'luda'],
+                'linked' => 'home', // привязано к умному дому
+                'format' => 'check',
+                'type' => 'sensor',
+            ],
+            'home/check/ralay01' => [ // датчик протечки воды
+                'condition' => [
+                    'normal'  => 0, // 1 - датчик = нет протечки
+                    'warning' => 1,
+                ],
+                'message' => function($value){
+                    return 'Состояние клапана №3 неизвестно!';
+                },
+                'sensorName' => MqttPayload::SWIFT_HOME01,
+                'users' => ['decole', 'luda'],
+                'linked' => 'home', // привязано к умному дому
+                'format' => 'check',
+                'type' => 'sensor',
+            ],
+            'home/check/ralay02' => [ // датчик протечки воды
+                'condition' => [
+                    'normal'  => 0, // 1 - датчик = нет протечки
+                    'warning' => 1,
+                ],
+                'message' => function($value){
+                    return 'Состояние клапана №3 неизвестно!';
+                },
+                'sensorName' => MqttPayload::SWIFT_HOME02,
+                'users' => ['decole', 'luda'],
+                'linked' => 'home', // привязано к умному дому
                 'format' => 'check',
                 'type' => 'sensor',
             ],
@@ -717,7 +791,68 @@ class MqttHelper extends BaseController
                 'checkTopic' => 'water/check/3', // needed for check state in agent/check-commands
                 'type' => 'swift',
             ],
+            'margulis/lamp01' => [ // клапан 3 полива
+                'condition' => [
+                    'on' => 'on',
+                    'off' => 'off',
+                ],
+                'message' => function($value){
+                    return 'свет в пристройке - ' . $value;
+                },
+                'sensorName' => 'Лампа 1',//$sensorName,$sensorName[MqttPayload::SWIFT_LAMP01],
+                'users' => ['decole'],
+                'format' => 'home',
+                'RelayID' => 5,
+                'checkTopic' => 'margulis/check/lamp01', // needed for check state in agent/check-commands
+                'type' => 'swift',
+            ],
+            'home/ralay01' => [ // пеле управления котлом
+                'condition' => [
+                    'on' => 'on',
+                    'off' => 'off',
+                ],
+                'message' => function($value){
+                    return 'реле управления котлом - ' . $value;
+                },
+                'sensorName' => 'Котел',//$sensorName,$sensorName[MqttPayload::SWIFT_HOME01],
+                'users' => ['decole'],
+                'format' => 'home',
+                'RelayID' => 6,
+                'checkTopic' => 'home/check/ralay01', // needed for check state in agent/check-commands
+                'type' => 'swift',
+            ],
+            'home/ralay02' => [ // клапан 3 полива
+                'condition' => [
+                    'on' => 'on',
+                    'off' => 'off',
+                ],
+                'message' => function($value){
+                    return 'резерное реле управления котлом - ' . $value;
+                },
+                'sensorName' => 'Резерв',//$sensorName,$sensorName[MqttPayload::SWIFT_HOME02],
+                'users' => ['decole'],
+                'format' => 'home',
+                'RelayID' => 7,
+                'checkTopic' => 'home/check/ralay02', // needed for check state in agent/check-commands
+                'type' => 'swift',
+            ],
+
+            // Site Pulse
+            'vokod/pulse' => [
+                'condition' => [
+                    'on' => 'on',
+                    'off' => 'off',
+                ],
+                'message' => function($value){
+                    return 'свет в пристройке - ' . $value;
+                },
+                'sensorName' => 'пинг',//$sensorName,$sensorName[MqttPayload::SWIFT_LAMP01],
+                'users' => ['decole'],
+                'format' => 'ping',
+                'type' => 'ping',
+            ],
         ];
+
     }
 
 }

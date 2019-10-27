@@ -37,14 +37,17 @@ class SensorsController extends Controller
         return view('sensors', [
                 'page_title' => 'Данные сенсоров',
                 'sensors' => [
-                    'margulis_temperature'    => $this->verifiMqttData('margulis/temperature'),
-                    'margulis_humidity'       => $this->verifiMqttData('margulis/humidity'),
-                    'holl_temperature'        => $this->verifiMqttData('holl/temperature'),
-                    'holl_humidity'           => $this->verifiMqttData('holl/humidity'),
-                    'underflor_temperature'   => $this->verifiMqttData('underflor/temperature'),
-                    'underflor_humidity'      => $this->verifiMqttData('underflor/humidity'),
-                    'underground_temperature' => $this->verifiMqttData('underground/temperature'),
-                    'underground_humidity'    => $this->verifiMqttData('underground/humidity'),
+                    'margulis_temperature'       => $this->verifiMqttData('margulis/temperature'),
+                    'margulis_humidity'          => $this->verifiMqttData('margulis/humidity'),
+                    'holl_temperature'           => $this->verifiMqttData('holl/temperature'),
+                    'holl_humidity'              => $this->verifiMqttData('holl/humidity'),
+                    'underflor_temperature'      => $this->verifiMqttData('underflor/temperature'),
+                    'underflor_humidity'         => $this->verifiMqttData('underflor/humidity'),
+                    'underground_temperature'    => $this->verifiMqttData('underground/temperature'),
+                    'underground_humidity'       => $this->verifiMqttData('underground/humidity'),
+                    'home_kitchen_temperature'   => $this->verifiMqttData('home/kitchen/temperature'),
+                    'home_restroom_temperature'  => $this->verifiMqttData('home/restroom/temperature'),
+                    'home_hall_temperature'      => $this->verifiMqttData('home/hall/temperature'),
                 ],
                 'acuweather' => $acuweather,
                 'max' => $timeLineW,
@@ -88,7 +91,11 @@ class SensorsController extends Controller
         $data = null;
         $data = $cache->getCacheMqtt($topic);
         if($data === null) {
-            return MqttPayload::where(['topic' => $topic])->orderByDesc('created_at', 'id')->first()->payload . ' - no cache';
+            $query = MqttPayload::where(['topic' => $topic])->orderByDesc('created_at', 'id')->first();
+            if(isset($query->payload)) {
+                return MqttPayload::where(['topic' => $topic])->orderByDesc('created_at', 'id')->first()->payload . ' - no cache';
+            }
+            return null;
         }
         return $data;
 
@@ -216,21 +223,29 @@ class SensorsController extends Controller
         $min = '';
         foreach ($mqttData as $mqtt) {
             $timeMqtt = date_timestamp_get(date_create($mqtt->datetime));
-            foreach ($weatherData as $key => $acuweather) {
-                $timeAcuweather = date_timestamp_get(date_create($acuweather->date));
-                if($timeMqtt > $timeAcuweather ) {
-                    $min = $acuweather->temperature;
-                }
-                if($timeMqtt < $timeAcuweather) {
-                    if(empty($min)) {
-                        $min =  $acuweather->temperature;
+            if(!empty($weatherData)) {
+                foreach ($weatherData as $key => $acuweather) {
+                    $timeAcuweather = date_timestamp_get(date_create($acuweather->date));
+                    if ($timeMqtt > $timeAcuweather) {
+                        $min = $acuweather->temperature;
                     }
-                    $chart[$mqtt->datetime] = [
-                        'mqtt' => $mqtt->payload,
-                        'acuweather' => $acuweather->temperature,
-                    ];
-                    break;
+                    if ($timeMqtt < $timeAcuweather) {
+                        if (empty($min)) {
+                            $min = $acuweather->temperature;
+                        }
+                        $chart[$mqtt->datetime] = [
+                            'mqtt' => $mqtt->payload,
+                            'acuweather' => $acuweather->temperature,
+                        ];
+                        break;
+                    }
                 }
+            }
+            else {
+                $chart[$mqtt->datetime] = [
+                    'mqtt' => $mqtt->payload,
+                    'acuweather' => '',
+                ];
             }
         }
         $template = [];

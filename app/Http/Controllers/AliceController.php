@@ -33,7 +33,32 @@ class AliceController extends Controller
                 'text' => htmlspecialchars_decode($text),
                 'tts'  => htmlspecialchars_decode($text),
                 'buttons' => [],
+                //'end_session' => $this->end_session,
                 'end_session' => $this->end_session,
+            ],
+            'session' => [
+                'session_id' => $apiRequestArray['session']['session_id'],
+                'message_id' => $apiRequestArray['session']['message_id'],
+                'user_id' => $apiRequestArray['session']['user_id'],
+            ],
+            'version' => $apiRequestArray['version']
+        ];
+
+        return response()->json($arrayToEncode);
+
+    }
+
+    public function actionSmartHome()
+    {
+        $apiRequestArray = json_decode(trim(file_get_contents('php://input')), true);
+        $text = $this->process($apiRequestArray);
+        $arrayToEncode = [
+            'response' => [
+                'text' => htmlspecialchars_decode($text),
+                'tts'  => htmlspecialchars_decode($text),
+                'buttons' => [],
+                //'end_session' => $this->end_session,
+                'end_session' => true,
             ],
             'session' => [
                 'session_id' => $apiRequestArray['session']['session_id'],
@@ -194,7 +219,6 @@ class AliceController extends Controller
             return $alice->stopScheduleWatering();
         }
         $this->end_session = true;
-
         return 'Уточните, сказав: "Планировщик старт" или "Планировщик стоп"';
 
     }
@@ -264,7 +288,6 @@ class AliceController extends Controller
         }
 
         $this->end_session = true;
-
         return 'У вас нет прав на это действие';
 
     }
@@ -283,23 +306,22 @@ class AliceController extends Controller
             in_array('включить', $tokens)
 
         ) {
-//            if($this->isAdmin) {
-                return $alice->lampOn();
-//            }
-
-//            return 'У вас нет прав на это действие';
+            $this->end_session = true;
+            return $alice->lampOn();
         }
 
         if(
             in_array('выключить', $tokens) ||
             in_array('выключи', $tokens)
         ) {
+            $this->end_session = true;
             return $alice->lampOff();
         }
 
 //        if($this->isAdmin) {
 //            return $alice->hoseOn();
 //        }
+
         $this->end_session = true;
         return 'У вас нет прав на это действие';
 
@@ -313,7 +335,7 @@ class AliceController extends Controller
      */
     private function error(): string
     {
-        return 'Хм';
+        return 'Не известный запрос';
     }
 
     /**

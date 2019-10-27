@@ -39,7 +39,7 @@ class WaterController extends Controller
 
         return view('watering', [
                 'page_title' => 'Данные сенсоров',
-                'ralays' =>$sensors,
+                'ralays'     => $sensors,
                 'sidebar'    => $request->sideBarComponent,
             ]
         );

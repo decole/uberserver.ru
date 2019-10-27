@@ -2,8 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\MqttHelper;
+use App\Mail\NotificationMail;
+use App\Notifications\SecurityInfo;
+use App\Notifications\SensorsInfo;
+use App\Notifications\SiteInfo;
+use App\Notifications\SystemInfo;
+use App\Relays;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
 class SiteController extends Controller
 {
@@ -67,6 +77,20 @@ class SiteController extends Controller
             }
         }
 
+//        $user = User::find(1);
+//        $user->notify(new SiteInfo('message to notify'));
+
+//      Пример отправки сообщений на почту
+//      Mail::to('decole@rambler.ru')
+//          ->send(new NotificationMail('lol', 'alarm'));
+
+//      Пример использования нотификаций где угодно
+//      Notification::send($user, new SecurityInfo('lol', 'alarm'));
+
+//      Или через контроллер из юзера
+//      $user = User::find(1);
+//      $user->notify(new SystemInfo('lol', 'alarm'));
+
         return view('index', [
             'page_title' => 'Start Page',
             'speech'     => $speech,
@@ -74,4 +98,35 @@ class SiteController extends Controller
             'sidebar'    => $request->sideBarComponent,
         ]);
     }
+
+    /**
+     * Page shown watering swifts
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function showHomeSwifts(Request $request)
+    {
+        $mqtt = new MqttHelper();
+        $options = $mqtt::listTopics();
+        $sensors = [];
+
+        foreach ($options as $key=>$value) {
+            if($value['format'] == 'home' && $value['type'] == 'swift') {
+                $sensors[$key]['name'] = $value['sensorName'];
+                $sensors[$key]['topic'] = $key;
+                $sensors[$key]['id'] = $value['RelayID'];
+                $sensors[$key]['state'] = 'off';
+            }
+        }
+
+        return view('smarthome', [
+                'page_title' => 'Умный дом',
+                'ralays'     => $sensors,
+                'sidebar'    => $request->sideBarComponent,
+            ]
+        );
+
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\User;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,14 +17,17 @@ class SideBar
      */
     public function handle($request, Closure $next)
     {
-        static $sideBarComponent;
-
         $id = Auth::id();
-        $request->sideBarComponent = [
-            'user_id' => $id,
-        ];
+        if($id) {
+            $user = User::find($id);
 
-//        var_dump( $id );
+            $request->sideBarComponent = [
+                'notification' => $user->unreadNotifications,
+                'count_notification' => count($user->unreadNotifications),
+            ];
+        }
+
+
         return $next($request);
     }
 }

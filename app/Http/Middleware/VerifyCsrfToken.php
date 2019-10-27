@@ -21,5 +21,7 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         '/alice', // игнорирование CSFR реквеста для Яндекс Алисы
         '/telegram/*', // игнорировать для телеграм вэб хука
+        '/ping',
+        '/alice_home',
     ];
 }

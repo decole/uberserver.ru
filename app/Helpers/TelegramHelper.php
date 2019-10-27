@@ -135,8 +135,6 @@ class TelegramHelper extends BaseController
             }
         } catch (TelegramException $e) {
             echo $e->getMessage();
-            // Log telegram errors
-            //TelegramLog::error($e);
             Log::channel('telegramBot')->error($e);
         }
 
@@ -159,6 +157,8 @@ class TelegramHelper extends BaseController
             $telegram->useGetUpdatesWithoutDatabase();
             $telegram->enableLimiter();
             $telegram->handle();
+            //$server_response = $telegram->handle();
+            //Log::channel('telegramBot')->error($server_response->getResult());
         } catch (TelegramException $e) {
             echo $e->getMessage();
             // Log telegram errors
@@ -166,6 +166,7 @@ class TelegramHelper extends BaseController
             Log::channel('telegramBot')->error($e);
         }
         return 'web-hook';
+
     }
 
     /**
@@ -176,20 +177,15 @@ class TelegramHelper extends BaseController
      */
     public function setHook()
     {
-        try {
-            // Create Telegram API object
-            $telegram = $this->telegram;
-
-            // Set webhook
-            $result = $telegram->setWebhook($this->hookUrl);
-            if ($result->isOk()) {
-                return $result->getDescription();
-            }
-        } catch (TelegramException $e) {
-            // log telegram errors
-            // echo $e->getMessage();
+        // Create Telegram API object
+        $telegram = $this->telegram;
+        // Set webhook
+        $result = $telegram->setWebhook($this->hookUrl);
+        if ($result->isOk()) {
+            return $result->getDescription();
         }
         return 'set hook';
+
     }
 
 }

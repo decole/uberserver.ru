@@ -26,6 +26,7 @@ class MqttPayload extends Model
      */
     protected $table = 'mqtt_payload';
 
+    // topics of sensors !!! not added check topics on watering
     const SENSOR_HOLL_TEMPERATURE        = 'holl/temperature';
     const SENSOR_HOLL_HUMIDITY           = 'holl/humidity';
     const SENSOR_UNDERFLOR_TEMPERATURE   = 'underflor/temperature';
@@ -35,14 +36,25 @@ class MqttPayload extends Model
     const SENSOR_MARGULIS_TEMPERATURE    = 'margulis/temperature';
     const SENSOR_MARGULIS_HUMIDITY       = 'margulis/humidity';
     const SENSOR_WATER_LEAKAGE           = 'water/leakage';
+    const SENSOR_HOME_KITCHN_TEMPERATURE = 'home/kitchen/temperature';
+    const SENSOR_HOME_RESTRM_TEMPERATURE = 'home/restroom/temperature';
+    const SENSOR_HOME_HALL_TEMPERATURE   = 'home/hall/temperature';
+    const SENSOR_SERVICE_PING            = 'vokod/pulse';
 
+    // topics of swifts
     const SWIFT_WATER_MAJOR              = 'water/major';
     const SWIFT_WATER_1                  = 'water/1';
     const SWIFT_WATER_2                  = 'water/2';
     const SWIFT_WATER_3                  = 'water/3';
+    const SWIFT_LAMP01                   = 'margulis/lamp01';
+    const SWIFT_HOME01                   = 'home/ralay01';
+    const SWIFT_HOME02                   = 'home/ralay02';
     const SWIFT_DEFAULT                  = 'noname';
 
+    // name of real controllers
     const MARGULIS                       = 'MARGULIS';
+    const MARGULIS_RELAYS                = 'MARGULIS_RELAYS';
+    const HOME_CONTROL                   = 'HOME_CONTROL';
     const WATERING                       = 'WATERING';
 
     /**
@@ -61,7 +73,11 @@ class MqttPayload extends Model
             static::SENSOR_UNDERGROUND_HUMIDITY    => 'влажность под низами',
             static::SENSOR_MARGULIS_TEMPERATURE    => 'температура в пристройке',
             static::SENSOR_MARGULIS_HUMIDITY       => 'влажность в пристройке',
+            static::SENSOR_HOME_KITCHN_TEMPERATURE => 'home/kitchen/temperature',
+            static::SENSOR_HOME_RESTRM_TEMPERATURE => 'home/restroom/temperature',
+            static::SENSOR_HOME_HALL_TEMPERATURE   => 'home/hall/temperature',
             static::SENSOR_WATER_LEAKAGE           => 'умный полив-датчик протечки воды',
+            static::SENSOR_SERVICE_PING            => 'пинг сервис',
         ];
 
     }
@@ -74,10 +90,13 @@ class MqttPayload extends Model
     public static function getSwiftNames(): array
     {
         return [
-            static::SWIFT_WATER_MAJOR => 'главный клапан полива',
-            static::SWIFT_WATER_1     => 'клапан 1 полива',
-            static::SWIFT_WATER_2     => 'клапан 2 полива',
-            static::SWIFT_WATER_3     => 'клапан 3 полива',
+            static::SWIFT_WATER_MAJOR => 'Главный клапан полива',
+            static::SWIFT_WATER_1     => 'Клапан 1 полива',
+            static::SWIFT_WATER_2     => 'Клапан 2 полива',
+            static::SWIFT_WATER_3     => 'Клапан 3 полива',
+            static::SWIFT_LAMP01      => 'Лампа 1',
+            static::SWIFT_HOME01      => 'Котел',
+            static::SWIFT_HOME02      => 'Котел резерв',
             static::SWIFT_DEFAULT     => 'не идентифицированное устройство',
         ];
 
@@ -91,8 +110,15 @@ class MqttPayload extends Model
     public static function getModuleNames(): array
     {
         return [
-            static::MARGULIS => ['name' => 'модуль пристройка-прихожка-низа', 'check_topic' => 'margulis/temperature'],
-            static::WATERING => ['name' => 'автополив', 'check_topic' => 'water/check/major'],
+            static::MARGULIS     => [
+                'name' => 'модуль пристройка-прихожка-низа',
+                'check_topic' => 'margulis/temperature',
+            ],
+//            static::HOME_CONTROL => [
+//                'name' => 'модуль дом-температура-котел',
+//                'check_topic' => 'home/kitchen/temperature',
+//            ],
+            //static::WATERING => ['name' => 'автополив', 'check_topic' => 'water/check/major'],
         ];
 
     }
