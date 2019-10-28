@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\MqttHelper;
 use App\MqttPayload;
+use App\Notifications\SiteInfo;
 use App\Relays;
 use App\User;
 use App\WorkTimer;
@@ -271,7 +272,39 @@ class WebApiController extends Controller
         $model->time_end   = date('Y-m-d H:i:s', strtotime('+' . $addMinutes . ' minutes'));
         $model->save();
 
+        $user = User::find(1);
+        $user->notify(new SiteInfo('таймер ' . $model->name . ' включен на ' . $addMinutes . ' минут'));
+
         return 'ok';
 
     }
+
+    /**
+     * get timer params
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function getTimer(Request $request)
+    {
+        $id = $request->id;
+        /** @var WorkTimer $model */
+        $model = WorkTimer::where('id', $id)->first();
+        $model->seconds = 0;
+        if($model->active == 1){
+            $model->seconds = strtotime($model->time_end)-time();
+        }
+
+        // security protection
+        unset($model->created_at);
+        unset($model->updated_at);
+        unset($model->topic);
+        unset($model->command_on);
+        unset($model->command_off);
+        unset($model->linked);
+
+        return $model;
+
+    }
+
 }

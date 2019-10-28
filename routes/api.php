@@ -60,3 +60,5 @@ Route::middleware('api')->get('/emergency-stop', 'WebApiController@emergencySens
 Route::middleware('api')->get('/notifySite', 'WebApiController@notify');
 
 Route::middleware('api')->get('/addTimer', 'WebApiController@addTimer');
+
+Route::middleware('api')->get('/getTimer', 'WebApiController@getTimer');

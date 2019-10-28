@@ -195,16 +195,44 @@ $(document).ready(function () {
         const el = $(this);
         let id = parent.data("id");
         let minutes = parent.find( "select" ).val();
-        // https://uberserver.ru/api/addTimer?id=1&minutes=30
         $.get("/api/addTimer?id="+id+"&minutes="+minutes, function (data) {
-            console.log(data);
-            if (data == 'ok') {
-                parent.removeClass("bg-yellow").removeClass("bg-red").addClass("bg-green");
-                parent.find( "p.boiler-timer" ).text('on');
-                el.remove();
+            if (data === 'ok') {
+                setTimeout(getTimer, 1500);
             }
         });
+
     });
+
+    function getTimer() {
+        $(".timer-control").map(function (key, value) {
+            let id = $(value).data("id");
+            let timer = [];
+            let timeIntervalTicker = [];
+            $.get("/api/getTimer?id="+id, function (data) {
+                if(data['active'] === 1) {
+                    timer[id] = data['seconds'];
+                    timeIntervalTicker[id] = setInterval(function run(){
+                        $(value).find("span.timer-information").text(timer[id]);
+                        timer[id] = timer[id] - 1;
+                        if( timer[id] < 0 ) {
+                            clearTimeout(timeIntervalTicker[id]);
+                            $(value).find("span.timer-information").text('off');
+                            $(value).removeClass("bg-yellow").removeClass("bg-green").addClass("bg-red");
+                        }
+                    }, 1000);
+                    $(value).removeClass("bg-yellow").removeClass("bg-red").addClass("bg-green");
+                }
+                if(data['active'] === 0) {
+                    $(value).find("span.timer-information").text('off');
+                    $(value).removeClass("bg-yellow").removeClass("bg-green").addClass("bg-red");
+                }
+            });
+        });
+    }
+
+    if($(".timer-control").length) {
+        getTimer();
+    }
 
 
 });

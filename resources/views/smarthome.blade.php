@@ -66,6 +66,7 @@
                             <option value="20">20 мин.</option>
                             <option value="10">10 мин.</option>
                         </select>
+                        <span class="timer-information"></span>
                     </p>
                 </div>
                 <div class="icon">
