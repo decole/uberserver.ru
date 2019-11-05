@@ -78,10 +78,10 @@
             </div><!-- /.box -->
         </div><!-- /.col (RIGHT) -->
     </div>
-<!--
+
     <div class="row">
         <div class="col-md-6">
-
+            <!-- LINE CHART -->
             <div class="box box-info">
                 <div class="box-header with-border">
                     <h3 class="box-title">Зал <b class="dateIs"><?=date('Y-m-d');?></b></h3>
@@ -92,12 +92,13 @@
                 </div>
                 <div class="box-body">
                     <div class="chart">
-                        <canvas class="sensorchart" data-topic="home/hall/temperature" id="lineChart2" height="250"></canvas>
+                        <canvas class="sensorchart" data-topic="home/hall/temperature" id="lineChart5" height="250"></canvas>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col (RIGHT) -->
         <div class="col-md-6">
+            <!-- LINE CHART -->
             <div class="box box-info">
                 <div class="box-header with-border">
                     <h3 class="box-title">Кухня <b class="dateIs"><?=date('Y-m-d');?></b></h3>
@@ -108,33 +109,12 @@
                 </div>
                 <div class="box-body">
                     <div class="chart">
-                        <canvas class="sensorchart" data-topic="home/kitchen/temperature" id="lineChart1" height="250"></canvas>
+                        <canvas class="sensorchart" data-topic="home/kitchen/temperature" id="lineChart6" height="250"></canvas>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
+        </div><!-- /.col (RIGHT) -->
     </div>
-
-    <div class="row">
-        <div class="col-md-6">
-             <div class="box box-info">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Ванная <b class="dateIs"><?=date('Y-m-d');?></b></h3>
-                    <div class="box-tools pull-right">
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                        <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div class="chart">
-                        <canvas class="sensorchart" data-topic="home/restroom/temperature" id="lineChart2" height="250"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
--->
-
 
 
 

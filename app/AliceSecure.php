@@ -47,9 +47,9 @@ class AliceSecure extends Model
     {
 //        $model = self::where(['user_id' => $id])->first();
 //        var_dump($model);
-
-        if(self::where(['user_id' => $id])->first() === null) {
-            $model = new self();
+        $model = self::where(['user_id' => $id])->first();
+        if($model === null) {
+            $model = new AliceSecure();
             $model->user_id = $id;
             $model->valid = 1;
             $model->save();

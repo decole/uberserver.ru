@@ -122,19 +122,23 @@ class TelegramHelper extends BaseController
             $telegram->enableLimiter();
             $server_response = $telegram->handleGetUpdates();
             if ($server_response->isOk()) {
-//                $update_count = count($server_response->getResult());
-//                Log::channel('telegramBot')->info(
-//                    date('Y-m-d H:i:s', time())
-//                    . ' - Processed '
-//                    . $update_count
-//                    . ' updates'
-//                );
+                echo 'tik - ok'.PHP_EOL;
+                $update_count = count($server_response->getResult());
+                print_r(
+                    date('Y-m-d H:i:s', time())
+                    . ' - Processed '
+                    . $update_count
+                    . ' updates'.PHP_EOL
+                );
             } else {
                 echo date('Y-m-d H:i:s', time()) . ' - Failed to fetch updates' . PHP_EOL;
                 Log::channel('telegramBot')->info($server_response->printError());
+                Log::channel('telegramBot')->info($server_response->printError());
+                print_r($server_response->printError());
+                echo PHP_EOL;
             }
         } catch (TelegramException $e) {
-            echo $e->getMessage();
+            print_r($e->getMessage());
             Log::channel('telegramBot')->error($e);
         }
 
@@ -157,8 +161,8 @@ class TelegramHelper extends BaseController
             $telegram->useGetUpdatesWithoutDatabase();
             $telegram->enableLimiter();
             $telegram->handle();
-            //$server_response = $telegram->handle();
-            //Log::channel('telegramBot')->error($server_response->getResult());
+            $server_response = $telegram->handle();
+            Log::channel('telegramBot')->error($server_response->getResult());
         } catch (TelegramException $e) {
             echo $e->getMessage();
             // Log telegram errors
