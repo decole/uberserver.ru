@@ -25,12 +25,6 @@ Route::any('/home_swifts', 'SiteController@showHomeSwifts');
 
 Route::get('/chart', 'SensorsController@chartShow');
 
-Route::get('/alarm', function () {
-    return view('index', [
-        'page_title' => 'Мониторинг аварийности'
-    ]);
-});
-
 Route::any('/alice', 'AliceController@actionIndex');
 
 Route::get('/ping', 'SiteApiController@pingSite');

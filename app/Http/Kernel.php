@@ -34,12 +34,12 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\SideBar::class,
+            \App\Http\Middleware\SideBar::class, // decole midleware
             \Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
         ],
 
         'api' => [
-            'throttle:100,1',
+            'throttle:120,1',
             'bindings',
         ],
     ];
